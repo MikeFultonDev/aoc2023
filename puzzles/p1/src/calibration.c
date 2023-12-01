@@ -2,9 +2,49 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 
-unsigned long long calibration(const char* data) 
+static unsigned long long calibration(const char* data, size_t datasize) 
 {
-  return 0ULL;
+  unsigned long long tot=0ULL;
+  unsigned long long totline;
+  unsigned long long first, last, num;
+
+  enum State {
+    nomatch=1,
+    firstmatch=2,
+    multimatch=3
+  } state = nomatch;
+
+  for (size_t i=0; i<datasize; ++i) {
+    if (data[i] == '\n') {
+      if (state == nomatch) {
+        totline = 0ULL;
+      } else if (state == firstmatch) {
+        totline = ((first * 10ULL) + first);
+      } else {
+        totline = ((first * 10ULL) + last);
+      }
+      state = nomatch;
+      tot += totline;
+    }
+    if (data[i] >= '0' && data[i] <= '9') {
+      num = data[i] - '0';
+      switch (state) {
+        case nomatch:
+          first = num;
+          state = firstmatch;
+          break;
+        case firstmatch:
+          last = num;
+          state = multimatch;
+          break;
+        case multimatch:
+          last = num;
+          break;
+      }
+    }
+  }
+     
+  return tot;
 }
 
 int main(int argc, char* argv[]) {
@@ -45,7 +85,7 @@ int main(int argc, char* argv[]) {
     return(20);
   }
 
-  printf("Calibration: %llu\n", calibration(data));
+  printf("Calibration: %llu\n", calibration(data, filesize));
 
   return 0;
 }
