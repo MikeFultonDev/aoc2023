@@ -21,15 +21,17 @@ def game_results(line):
             colour = tok[1]
             match colour:
                 case 'red':
-                    if 
+                    if num > min_red:
+                        min_red = num
                 case 'green':
-                    green_tot += num
+                    if num > min_green:
+                        min_green = num
                 case 'blue':
-                    blue_tot += num
-        if red_tot > RMAX or green_tot > GMAX or blue_tot > BMAX:
-            return False, game_id
+                    if num > min_blue:
+                        min_blue = num
 
-    return True, game_id
+    power = min_red * min_green * min_blue
+    return True, power
 
 def main():
     if len(sys.argv) < 2:
@@ -48,11 +50,11 @@ def main():
     
     tgid = 0
     for line in lines:
-        possible, gid = game_results(line)
+        possible, power = game_results(line)
         if possible:
-            tgid += gid
+            tgid += power
 
-    print("Total of Possible Game IDs is: " + str(tgid))
+    print("Total of Powers for Possible Game IDs is: " + str(tgid))
     return 0
 
 if __name__ == "__main__":
