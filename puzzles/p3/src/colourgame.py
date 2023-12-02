@@ -1,4 +1,15 @@
+#!/bin/env python
+
 import sys
+
+RMAX = 12
+GMAX = 13
+BMAX = 14
+
+def game_results(line):
+    possible=True
+    gid=1
+    return possible,gid
 
 def main():
     if len(sys.argv) < 2:
@@ -14,12 +25,14 @@ def main():
         return 8
 
     Lines = colour_file.readlines()
-
+    
+    tgid = 0
     for line in Lines:
-        print(line.strip())
+        possible,gid = game_results(line)
+        if possible:
+            tgid += gid
 
-    out = line.split(",")
-
+    print("Total of Possible Game IDs is: " + str(tgid))
     return 0
 
 if __name__ == "__main__":
