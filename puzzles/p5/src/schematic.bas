@@ -27,8 +27,13 @@ DEF blankline(line$)
   RETURN bl$
 ENDDEF
 
-DEF addpartnumber(before$, this$, after$, start, finis)
-  PRINT "  Number: " + MID($this, start, finis-start+1);
+DEF addpartnumber(s$, f$, before$, this$, after$)
+  sv = VAL(s$)
+  fv = VAL(f$)
+
+  l = fv - sv + 1
+  num = MID(this$, sv, l)
+  PRINT "  Number: " + num;
 ENDDEF
 
 DEF addpartnumbers(before$, this$, after$)
@@ -51,15 +56,20 @@ DEF addpartnumbers(before$, this$, after$)
 
   REM Find the bounds of each number one at a time
 
-  start = 0
-  finis = 0
+  s = 0
+  f = 0
   tot = 0
   PRINT "Processing: " + this$;
-  FOR i = 2 TO LEN(this$) - 1
+  FOR i = 1 TO LEN(this$) - 1
     c$ = MID(this$, i, 1)    
-    IF c$ >= "0" AND c$ <= "9" THEN IF start = 0 THEN start = i
-    IF c$ >= "0" AND c$ <= "9" THEN finis = i
-    IF c$ < "0" OR c$ > "9" THEN start = 0 : tot = tot + addpartnumber(before$, this$, after$, start, finis)
+    IF c$ >= "0" AND c$ <= "9" THEN IF s = 0 THEN s = i
+    IF c$ >= "0" AND c$ <= "9" THEN f = i
+    ss$ = STR(s)
+    fs$ = STR(f)
+
+    REM Values have to be passed as strings
+
+    IF c$ < "0" OR c$ > "9" AND s > 0 THEN tot = tot + addpartnumber(ss$, fs$, before$, this$, after$) : s = 0
   NEXT i
 
   RETURN tot
