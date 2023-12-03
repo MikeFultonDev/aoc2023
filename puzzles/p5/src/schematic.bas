@@ -27,13 +27,42 @@ DEF blankline(line$)
   RETURN bl$
 ENDDEF
 
+DEF addpartnumber(before$, this$, after$, start, finis)
+  PRINT "  Number: " + MID($this, start, finis-start+1);
+ENDDEF
+
 DEF addpartnumbers(before$, this$, after$)
-  PRINT "---";
+  REM
+  REM Add a '.' at the start and end of each line so that it's safe to navigate around 
+  REM the 8 positions around each numeric digit looking for a match
+  REM
+
+  before$ = "." + before$ + "."
+  this$ = "." + this$ + "."
+  after$ = "." + after$ + "."
+
   PRINT "before: " + before$;
   PRINT "this:   " + this$;
   PRINT "after:  " + after$;
 
-  RETURN 0
+  REM
+  REM Basic has the first element at index 1
+  REM
+
+  REM Find the bounds of each number one at a time
+
+  start = 0
+  finis = 0
+  tot = 0
+  PRINT "Processing: " + this$;
+  FOR i = 2 TO LEN(this$) - 1
+    c$ = MID(this$, i, 1)    
+    IF c$ >= "0" AND c$ <= "9" THEN IF start = 0 THEN start = i
+    IF c$ >= "0" AND c$ <= "9" THEN finis = i
+    IF c$ < "0" OR c$ > "9" THEN start = 0 : tot = tot + addpartnumber(before$, this$, after$, start, finis)
+  NEXT i
+
+  RETURN tot
 ENDDEF
 
 DEF main()
