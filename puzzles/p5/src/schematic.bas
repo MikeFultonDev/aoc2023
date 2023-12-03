@@ -32,8 +32,9 @@ DEF addpartnumber(s$, f$, before$, this$, after$)
   fv = VAL(f$)
 
   l = fv - sv + 1
-  num = MID(this$, sv, l)
-  PRINT "  Number: " + num;
+  nums$ = MID(this$, sv, l)
+  num = VAL(nums$)
+  RETURN num
 ENDDEF
 
 DEF addpartnumbers(before$, this$, after$)
@@ -77,10 +78,12 @@ ENDDEF
 
 DEF main()
   REM No While loop in the original language, but FOR i = 1 TO was supported, but not in this emulator
+
   linebefore$ = ""
   lineafter$ = ""
   line$ = ""
   done = 0
+  tot = 0
   FOR i = 1 TO 1000000 
     IF line$ = "" THEN line$ = readline()
     IF linebefore$ = "" THEN linebefore$ = blankline(line$)
@@ -89,8 +92,9 @@ DEF main()
     thisline$ = line$
 
     linepartnumbertotal = addpartnumbers(linebefore$, thisline$, lineafter$)
+    tot = tot + linepartnumbertotal
 
-    IF done = 1 THEN RETURN 0
+    IF done = 1 THEN RETURN tot
 
     linebefore$ = thisline$ + ""
     line$ = lineafter$ + ""
@@ -99,5 +103,7 @@ DEF main()
 
 ENDDEF
 
-main()
+tot=main()
+tots$=STR(tot)
+PRINT "Schematic Total is: " + tots$;
 
