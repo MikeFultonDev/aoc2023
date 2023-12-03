@@ -20,14 +20,18 @@ DEF readline()
 ENDDEF
 
 DEF blankline(line$)
-  RETURN ".."
+  bl$ = ""
+  FOR i = 1 TO LEN(line$)
+    bl$ = bl$ + "."
+  NEXT i
+  RETURN bl$
 ENDDEF
 
 DEF addpartnumbers(before$, this$, after$)
   PRINT "---";
   PRINT "before: " + before$;
-  PRINT "this: " + this$;
-  PRINT "after: " + after$;
+  PRINT "this:   " + this$;
+  PRINT "after:  " + after$;
 
   RETURN 0
 ENDDEF
@@ -37,15 +41,17 @@ DEF main()
   linebefore$ = ""
   lineafter$ = ""
   line$ = ""
+  done = 0
   FOR i = 1 TO 1000000 
     IF line$ = "" THEN line$ = readline()
     IF linebefore$ = "" THEN linebefore$ = blankline(line$)
     IF lineafter$ = "" THEN lineafter$ = readline()
-    IF line$ = "EOF" THEN lineafter$ = blankline(lineafter$)
+    IF lineafter$ = "EOF" THEN lineafter$ = blankline(line$) : done = 1
     thisline$ = line$
 
     linepartnumbertotal = addpartnumbers(linebefore$, thisline$, lineafter$)
-    IF line$ = "EOF" THEN RETURN
+
+    IF done = 1 THEN RETURN 0
 
     linebefore$ = thisline$ + ""
     line$ = lineafter$ + ""
