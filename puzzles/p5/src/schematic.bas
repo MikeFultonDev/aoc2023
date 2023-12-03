@@ -35,8 +35,6 @@ DEF addpartnumber(s$, f$, before$, this$, after$)
   nums$ = MID(this$, sv, l)
   num = VAL(nums$)
 
-  PRINT "Consider: " + nums$;
-
   REM First, check 'above' the number for a symbol
 
   FOR i=sv-1 TO fv+1
@@ -57,7 +55,6 @@ DEF addpartnumber(s$, f$, before$, this$, after$)
 
   IF MID(this$, fv+1, 1) <> "." THEN RETURN num
 
-  PRINT "Reject: " + nums$;
 
   RETURN 0
 ENDDEF
@@ -73,7 +70,7 @@ DEF addpartnumbers(before$, this$, after$)
   after$ = "." + after$ + "."
 
   REM
-  REM Basic has the first element at index 1
+  REM Basic has the first element at index 1, but MID is 0 based
   REM
 
   REM Find the bounds of each number one at a time
@@ -81,7 +78,6 @@ DEF addpartnumbers(before$, this$, after$)
   s = 0
   f = 0
   linetot = 0
-  PRINT "Processing: " + this$;
   i = 1
   WHILE i < LEN(this$)
     c$ = MID(this$, i, 1)    
@@ -90,11 +86,10 @@ DEF addpartnumbers(before$, this$, after$)
     ss$ = STR(s)
     fs$ = STR(f)
 
-
     REM Values have to be passed as strings
 
     IF c$ < "0" OR c$ > "9" AND s > 0 THEN linetot = linetot + addpartnumber(ss$, fs$, before$, this$, after$)
-    IF c$ < "0" OR c$ > "9" AND s > 0 THEN i=i+f-s-2
+    IF c$ < "0" OR c$ > "9" AND s > 0 THEN i=f
     IF c$ < "0" OR c$ > "9" AND s > 0 THEN s=0 
 
     i=i+1
@@ -119,7 +114,6 @@ DEF main()
     thisline$ = line$
 
     schematictot = schematictot + addpartnumbers(linebefore$, thisline$, lineafter$)
-PRINT "Schematic total: " + STR(schematictot);
 
     IF done = 1 THEN RETURN schematictot
 
