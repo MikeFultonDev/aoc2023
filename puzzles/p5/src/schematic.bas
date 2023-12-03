@@ -34,7 +34,32 @@ DEF addpartnumber(s$, f$, before$, this$, after$)
   l = fv - sv + 1
   nums$ = MID(this$, sv, l)
   num = VAL(nums$)
-  RETURN num
+
+  PRINT "Consider: " + nums$;
+
+  REM First, check 'above' the number for a symbol
+
+  FOR i=sv-1 TO fv+1
+    IF MID(before$, i, 1) <> "." THEN RETURN num
+  NEXT i
+
+  REM Next, check 'below' the number for a symbol
+
+  FOR i=sv-1 TO fv+1
+    IF MID(after$, i, 1) <> "." THEN RETURN num
+  NEXT i
+
+  REM Next, check to the 'left' of the number for a symbol
+
+  IF MID(this$, sv-1, 1) <> "." THEN RETURN num
+
+  REM Finally, check to the 'right' of the number for a symbol
+
+  IF MID(this$, fv+1, 1) <> "." THEN RETURN num
+
+  PRINT "Reject: " + nums$;
+
+  RETURN 0
 ENDDEF
 
 DEF addpartnumbers(before$, this$, after$)
@@ -47,10 +72,6 @@ DEF addpartnumbers(before$, this$, after$)
   this$ = "." + this$ + "."
   after$ = "." + after$ + "."
 
-  PRINT "before: " + before$;
-  PRINT "this:   " + this$;
-  PRINT "after:  " + after$;
-
   REM
   REM Basic has the first element at index 1
   REM
@@ -59,21 +80,27 @@ DEF addpartnumbers(before$, this$, after$)
 
   s = 0
   f = 0
-  tot = 0
+  linetot = 0
   PRINT "Processing: " + this$;
-  FOR i = 1 TO LEN(this$) - 1
+  i = 1
+  WHILE i < LEN(this$)
     c$ = MID(this$, i, 1)    
     IF c$ >= "0" AND c$ <= "9" THEN IF s = 0 THEN s = i
     IF c$ >= "0" AND c$ <= "9" THEN f = i
     ss$ = STR(s)
     fs$ = STR(f)
 
+
     REM Values have to be passed as strings
 
-    IF c$ < "0" OR c$ > "9" AND s > 0 THEN tot = tot + addpartnumber(ss$, fs$, before$, this$, after$) : s = 0
-  NEXT i
+    IF c$ < "0" OR c$ > "9" AND s > 0 THEN linetot = linetot + addpartnumber(ss$, fs$, before$, this$, after$)
+    IF c$ < "0" OR c$ > "9" AND s > 0 THEN i=i+f-s-2
+    IF c$ < "0" OR c$ > "9" AND s > 0 THEN s=0 
 
-  RETURN tot
+    i=i+1
+  WEND
+
+  RETURN linetot
 ENDDEF
 
 DEF main()
@@ -83,7 +110,7 @@ DEF main()
   lineafter$ = ""
   line$ = ""
   done = 0
-  tot = 0
+  schematictot = 0
   FOR i = 1 TO 1000000 
     IF line$ = "" THEN line$ = readline()
     IF linebefore$ = "" THEN linebefore$ = blankline(line$)
@@ -91,10 +118,10 @@ DEF main()
     IF lineafter$ = "EOF" THEN lineafter$ = blankline(line$) : done = 1
     thisline$ = line$
 
-    linepartnumbertotal = addpartnumbers(linebefore$, thisline$, lineafter$)
-    tot = tot + linepartnumbertotal
+    schematictot = schematictot + addpartnumbers(linebefore$, thisline$, lineafter$)
+PRINT "Schematic total: " + STR(schematictot);
 
-    IF done = 1 THEN RETURN tot
+    IF done = 1 THEN RETURN schematictot
 
     linebefore$ = thisline$ + ""
     line$ = lineafter$ + ""
@@ -103,7 +130,7 @@ DEF main()
 
 ENDDEF
 
-tot=main()
-tots$=STR(tot)
+schematictot=main()
+tots$=STR(schematictot)
 PRINT "Schematic Total is: " + tots$;
 
