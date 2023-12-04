@@ -32,15 +32,20 @@ REM We will only look 'down' or on the same line for gear ratios
 REM so that we don't double-count
 REM
 
-DEF addgearratio(s$, f$, before$, this$, after$)
+DEF addgearratio(s$, f$, first$, second$, third$)
   sv = VAL(s$)
   fv = VAL(f$)
 
+REM PRINT "Start: " + s$ + " Finis: " + f$;
+REM PRINT "First: " + first$;
+REM PRINT "Second: " + second$;
+REM PRINT "Third: " + third$;
+
   l = fv - sv + 1
-  nums$ = MID(this$, sv, l)
+  nums$ = MID(first$, sv, l)
   num = VAL(nums$)
 
-  PRINT "Process Number: " + num$;
+  PRINT "Process Number: " + nums$;
 
   RETURN 0
 ENDDEF
@@ -74,7 +79,7 @@ DEF addgearratioline(first$, second$, third$)
 
     REM Values have to be passed as strings
 
-    IF c$ < "0" OR c$ > "9" AND s > 0 THEN linetot = linetot + addgearratio(ss$, fs$, before$, this$, after$)
+    IF c$ < "0" OR c$ > "9" AND s > 0 THEN linetot = linetot + addgearratio(ss$, fs$, first$, second$, third$)
     IF c$ < "0" OR c$ > "9" AND s > 0 THEN i=f
     IF c$ < "0" OR c$ > "9" AND s > 0 THEN s=0 
 
@@ -84,6 +89,16 @@ DEF addgearratioline(first$, second$, third$)
   RETURN linetot
 ENDDEF
 
+DEF addgearratiolastlines(second$, third$)
+  gearratiotot = 0
+  fourth$ = blankline(third$)
+  fifth$ = blankline(third$)
+  gearratiotot = gearratiotot + addgearratioline(second$, third$, fourth$)
+  gearratiotot = gearratiotot + addgearratioline(third$, fourth$, fifth$)
+
+  RETURN gearratiotot
+ENDDEF
+  
 DEF main()
   REM No While loop in the original language, but FOR i = 1 TO was supported, but not in this emulator
 
@@ -96,11 +111,11 @@ DEF main()
     IF firstline$ = "" THEN firstline$ = blankline(line$)
     IF secondline$ = "" THEN secondline$ = readline()
     IF thirdline$ = "" THEN thirdline$ = readline()
-    IF thirdline$ = "EOF" THEN thirdline$ = blankline(secondline$) : done = 1
+    IF thirdline$ = "EOF" THEN thirdline$ = blankline(secondline$) : done = 1 
 
     gearratiotot = gearratiotot + addgearratioline(firstline$, secondline$, thirdline$)
 
-    IF done = 1 THEN RETURN gearratiotot
+    IF done = 1 THEN gearratiotot = gearratiotot + addgearratiolastlines(secondline$, thirdline$) : RETURN gearratiotot
 
     firstline$ = secondline$ + ""
     secondline$ = thirdline$ + ""
