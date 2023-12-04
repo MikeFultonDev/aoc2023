@@ -33,7 +33,7 @@ REM so that we don't double-count
 REM
 
 DEF stoa(line$, s, l)
-  IF l = 0 THEN RETURN 0
+  IF l = 0 THEN RETURN -1
   ss$ = MID(line$, s, l)
   RETURN VAL(ss$)
 ENDDEF
@@ -87,10 +87,10 @@ DEF checkchoicenum(line$, l, c, r)
 
 REM PRINT "choice num. nl: " + STR(nl) + " nc: " + STR(nc) + " nr: " + STR(nr);
 
-  IF nl > 0 AND nr > 0 AND nc = 0 THEN RETURN 0
-  IF nl = 0 AND nr = 0 AND nc = 0 THEN RETURN 0
-  IF nl > 0 AND nc = 0 THEN RETURN nl
-  IF nr > 0 AND nc = 0 THEN RETURN nr
+  IF nl > 0 AND nr > 0 AND nc = -1 THEN RETURN -1
+  IF nl = 0 AND nr = 0 AND nc = -1 THEN RETURN -1
+  IF nl > 0 AND nc = -1 THEN RETURN nl
+  IF nr > 0 AND nc = -1 THEN RETURN nr
 
   REM Go backwards to get to the start index of the number and then get the number
 
@@ -130,13 +130,13 @@ REM PRINT "Third: " + third$;
   REM Check if * to the right, and there is a number below
   REM Check if * is below, and there is a number on my line to the right
 
-  g2 = 0
-  g3 = 0
-  g4 = 0
-  g5 = 0
-  g6 = 0
-  g7 = 0
-  g8 = 0
+  g2 = -1
+  g3 = -1
+  g4 = -1
+  g5 = -1
+  g6 = -1
+  g7 = -1
+  g8 = -1
   IF MID(first$, fv+1, 1) = "*" THEN g2 = checkexactstartnum(first$, fv+2)
 
   asterisk = aindex(second$, sv-1, fv+1)
@@ -160,6 +160,15 @@ REM PRINT "Third: " + third$;
   REM PRINT "G7: " + STR(g7);
   REM PRINT "G8: " + STR(g8);
 
+  IF g1 < 0 THEN g1 = 0
+  IF g2 < 0 THEN g2 = 0
+  IF g3 < 0 THEN g3 = 0
+  IF g4 < 0 THEN g4 = 0
+  IF g5 < 0 THEN g5 = 0
+  IF g6 < 0 THEN g6 = 0
+  IF g7 < 0 THEN g7 = 0
+  IF g8 < 0 THEN g8 = 0
+
   gN = g2+g3+g4+g5+g6+g7+g8
   IF gN = 0 THEN RETURN 0
 
@@ -167,8 +176,26 @@ REM PRINT "Third: " + third$;
 
   IF gN <> g2 AND gN <> g3 AND gN <> g4 AND gN <> g5 AND gN <> g6 AND gN <> g7 AND gN <> g8 THEN RETURN 0
 
-  PRINT "Gear Ratio: " + STR(g1) + "*" + STR(gN) + " = " + STR(g1*gN);
+  PRINT STR(g1) + " * " + STR(gN) + " = " + STR(g1*gN);
   RETURN g1*gN
+ENDDEF
+
+DEF addtreegearratio(is$, line$)
+  REM
+  REM      *
+  REM     n m
+  REM
+
+  index = VAL(is$)
+
+  IF MID(line$, index, 1) <> "." THEN RETURN 0
+
+  n = getnum(line$, index-1, -1)
+  m = getnum(line$, index+1, 1)
+
+  IF n <= 0 OR m <= 0 THEN RETURN 0
+  PRINT STR(n) + " * " + STR(m) + " = " + STR(n*m);
+  RETURN n*m
 ENDDEF
 
 DEF addgearratioline(first$, second$, third$)
@@ -190,8 +217,7 @@ DEF addgearratioline(first$, second$, third$)
   s = 0
   f = 0
   linetot = 0
-  i = 1
-  WHILE i < LEN(first$)
+  FOR i = 1 TO LEN(first$)-1
     c$ = MID(first$, i, 1)    
     IF c$ >= "0" AND c$ <= "9" THEN IF s = 0 THEN s = i
     IF c$ >= "0" AND c$ <= "9" THEN f = i
@@ -203,9 +229,14 @@ DEF addgearratioline(first$, second$, third$)
     IF c$ < "0" OR c$ > "9" AND s > 0 THEN linetot = linetot + addgearratio(ss$, fs$, first$, second$, third$)
     IF c$ < "0" OR c$ > "9" AND s > 0 THEN i=f
     IF c$ < "0" OR c$ > "9" AND s > 0 THEN s=0 
+  NEXT i
 
-    i=i+1
-  WEND
+  REM Check if * on first line and both numbers on either side below
+
+  FOR j = 1 TO LEN(first$)-1
+    is$ = STR(j)
+    IF MID(first$, j, 1) = "*" THEN linetot = linetot + addtreegearratio(is$, second$)
+  NEXT j
 
   RETURN linetot
 ENDDEF
@@ -249,5 +280,5 @@ ENDDEF
 
 gearratiotot=main()
 tots$=STR(gearratiotot)
-PRINT "Gear Ratio Total is: " + tots$;
+REM PRINT "Gear Ratio Total is: " + tots$; <-- This total is actually wrong?
 
