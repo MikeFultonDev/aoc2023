@@ -32,6 +32,42 @@ REM We will only look 'down' or on the same line for gear ratios
 REM so that we don't double-count
 REM
 
+DEF stoa(line$, s, l)
+  IF l = 0 THEN RETURN 0
+  ss$ = MID(line$, s, l)
+  RETURN VAL(ss$)
+ENDDEF
+
+DEF getfnum(line$, start)
+  FOR i = start TO LEN(line$)
+    c$ = MID(line$, i, 1)
+    IF c$ < "0" OR c$ > "9" THEN RETURN stoa(line$, start, i-start)
+  NEXT i
+ENDDEF
+
+DEF getbnum(line$, finis)
+  FOR i = finis TO LEN(line$) BY -1
+    c$ = MID(line$, i, 1)
+    IF c$ < "0" OR c$ > "9" THEN RETURN stoa(line$, i+1, finis-i)
+  DONE
+ENDDEF
+
+DEF getnum(line$, i, direction)
+  IF direction > 0 THEN RETURN getfnum(line$, i)
+  IF direction < 0 THEN RETURN getbnum(line$, i)
+ENDDEF
+
+DEF checkexactstartnum(line$, s)
+  RETURN getnum(line$, s, 1)
+ENDDEF
+
+DEF aindex(line$, s, f)
+  FOR i = s TO f
+    IF MID(line$, i, 1) = "*" THEN RETURN i
+  NEXT i
+  RETURN 0
+ENDDEF
+
 DEF addgearratio(s$, f$, first$, second$, third$)
   sv = VAL(s$)
   fv = VAL(f$)
@@ -47,7 +83,34 @@ REM PRINT "Third: " + third$;
 
   PRINT "Process Number: " + nums$;
 
-  RETURN 0
+  REM Check if * to the right, and there is a number following immediately 
+  REM Check if * is below, and there is a number immediately preceding
+  REM Check if * is below, and there is a number immediately following
+  REM Check if * is below, and there is a number on the next line touching
+
+  g2 = 0
+  g3 = 0
+  g4 = 0
+  g5 = 0
+  IF MID(first$, fv+1, 1) = "*" THEN g2 = checkexactstartnum(first$, fv+2)
+
+  PRINT STR(g2);
+
+  asterisk = aindex(second$, sv-1, fv+1)
+  IF asterisk > 0 THEN g3 = checkexactendnum(second$, asterisk-1)
+  IF asterisk > 0 THEN g4 = checkexactstartnum(second$, asterisk+1)
+  IF asterisk > 0 THEN g5 = checkrangenum(third$, asterisk-1, asterisk+1)
+
+  REM If there are 0 adjacent numbers, return 0
+
+  tot = g2+g3+g4+g5
+  IF tot == 0 THEN RETURN 0
+
+  REM If more than 1 set of numbers are adjacent, return 0
+
+  IF tot <> g2 AND tot <> g3 AND tot <> g4 AND tot <> g5 THEN RETURN 0
+
+  RETURN tot
 ENDDEF
 
 DEF addgearratioline(first$, second$, third$)
