@@ -46,10 +46,18 @@ DEF getfnum(line$, start)
 ENDDEF
 
 DEF getbnum(line$, finis)
-  FOR i = finis TO LEN(line$) BY -1
+  FOR i = finis TO 1 STEP -1
     c$ = MID(line$, i, 1)
     IF c$ < "0" OR c$ > "9" THEN RETURN stoa(line$, i+1, finis-i)
-  DONE
+  NEXT i
+ENDDEF
+
+DEF getbindex(line$, finis)
+  FOR i = finis TO 1 STEP -1
+    c$ = MID(line$, i, 1)
+    IF c$ < "0" OR c$ > "9" THEN RETURN i+1
+  NEXT i
+  RETURN 0
 ENDDEF
 
 DEF getnum(line$, i, direction)
@@ -61,6 +69,38 @@ DEF checkexactstartnum(line$, s)
   RETURN getnum(line$, s, 1)
 ENDDEF
 
+DEF checkexactendnum(line$, f)
+  RETURN getnum(line$, f, -1)
+ENDDEF
+
+REM If none of the number is in the min to max range, return 0
+REM If digit is found in the range, it could be a valid number
+REM BUT - there could be 2 numbers - which we need to reject
+
+REM Catch the special case where a digit is at min and one is at max
+REM We know that min and max only differ by 2
+
+DEF checkchoicenum(line$, l, c, r)
+  nl = getnum(line$, l, -1)
+  nc = getnum(line$, c, 1)
+  nr = getnum(line$, r, 1)
+
+PRINT "choice num. nl: " + STR(nl) + " nc: " + STR(nc) + " nr: " + STR(nr);
+
+  IF nl > 0 AND nr > 0 AND nc = 0 THEN RETURN 0
+  IF nl = 0 AND nr = 0 AND nc = 0 THEN RETURN 0
+  IF nl > 0 AND nc = 0 THEN RETURN nl
+  IF nr > 0 AND nc = 0 THEN RETURN nr
+
+  REM Go backwards to get to the start index of the number and then get the number
+
+  si = getbindex(line$, l)
+  
+  num = getnum(line$, si, 1)
+PRINT "num: " + STR(num) + " si: " + STR(si);
+  RETURN num
+ENDDEF
+
 DEF aindex(line$, s, f)
   FOR i = s TO f
     IF MID(line$, i, 1) = "*" THEN RETURN i
@@ -69,6 +109,7 @@ DEF aindex(line$, s, f)
 ENDDEF
 
 DEF addgearratio(s$, f$, first$, second$, third$)
+
   sv = VAL(s$)
   fv = VAL(f$)
 
@@ -79,9 +120,7 @@ REM PRINT "Third: " + third$;
 
   l = fv - sv + 1
   nums$ = MID(first$, sv, l)
-  num = VAL(nums$)
-
-  PRINT "Process Number: " + nums$;
+  g1 = VAL(nums$)
 
   REM Check if * to the right, and there is a number following immediately 
   REM Check if * is below, and there is a number immediately preceding
@@ -94,23 +133,28 @@ REM PRINT "Third: " + third$;
   g5 = 0
   IF MID(first$, fv+1, 1) = "*" THEN g2 = checkexactstartnum(first$, fv+2)
 
-  PRINT STR(g2);
-
   asterisk = aindex(second$, sv-1, fv+1)
   IF asterisk > 0 THEN g3 = checkexactendnum(second$, asterisk-1)
   IF asterisk > 0 THEN g4 = checkexactstartnum(second$, asterisk+1)
-  IF asterisk > 0 THEN g5 = checkrangenum(third$, asterisk-1, asterisk+1)
+  IF asterisk > 0 THEN g5 = checkchoicenum(third$, asterisk-1, asterisk, asterisk+1)
 
   REM If there are 0 adjacent numbers, return 0
 
-  tot = g2+g3+g4+g5
-  IF tot == 0 THEN RETURN 0
+  PRINT "Asterisk: " + STR(asterisk);
+  PRINT "G1: " + STR(g1);
+  PRINT "G2: " + STR(g2);
+  PRINT "G3: " + STR(g3);
+  PRINT "G4: " + STR(g4);
+  PRINT "G5: " + STR(g5);
+
+  gN = g2+g3+g4+g5
+  IF gN = 0 THEN RETURN 0
 
   REM If more than 1 set of numbers are adjacent, return 0
 
-  IF tot <> g2 AND tot <> g3 AND tot <> g4 AND tot <> g5 THEN RETURN 0
+  IF gN <> g2 AND gN <> g3 AND gN <> g4 AND gN <> g5 THEN RETURN 0
 
-  RETURN tot
+  RETURN g1*gN
 ENDDEF
 
 DEF addgearratioline(first$, second$, third$)
@@ -153,6 +197,7 @@ DEF addgearratioline(first$, second$, third$)
 ENDDEF
 
 DEF addgearratiolastlines(second$, third$)
+
   gearratiotot = 0
   fourth$ = blankline(third$)
   fifth$ = blankline(third$)
@@ -177,6 +222,7 @@ DEF main()
     IF thirdline$ = "EOF" THEN thirdline$ = blankline(secondline$) : done = 1 
 
     gearratiotot = gearratiotot + addgearratioline(firstline$, secondline$, thirdline$)
+
 
     IF done = 1 THEN gearratiotot = gearratiotot + addgearratiolastlines(secondline$, thirdline$) : RETURN gearratiotot
 

@@ -1,0 +1,3 @@
+FOR i = 1 TO 10 STEP -1
+  PRINT STR(i)
+NEXT
