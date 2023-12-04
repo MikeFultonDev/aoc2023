@@ -85,7 +85,7 @@ DEF checkchoicenum(line$, l, c, r)
   nc = getnum(line$, c, 1)
   nr = getnum(line$, r, 1)
 
-PRINT "choice num. nl: " + STR(nl) + " nc: " + STR(nc) + " nr: " + STR(nr);
+REM PRINT "choice num. nl: " + STR(nl) + " nc: " + STR(nc) + " nr: " + STR(nr);
 
   IF nl > 0 AND nr > 0 AND nc = 0 THEN RETURN 0
   IF nl = 0 AND nr = 0 AND nc = 0 THEN RETURN 0
@@ -97,7 +97,7 @@ PRINT "choice num. nl: " + STR(nl) + " nc: " + STR(nc) + " nr: " + STR(nr);
   si = getbindex(line$, l)
   
   num = getnum(line$, si, 1)
-PRINT "num: " + STR(num) + " si: " + STR(si);
+REM PRINT "num: " + STR(num) + " si: " + STR(si);
   RETURN num
 ENDDEF
 
@@ -122,15 +122,21 @@ REM PRINT "Third: " + third$;
   nums$ = MID(first$, sv, l)
   g1 = VAL(nums$)
 
-  REM Check if * to the right, and there is a number following immediately 
-  REM Check if * is below, and there is a number immediately preceding
-  REM Check if * is below, and there is a number immediately following
-  REM Check if * is below, and there is a number on the next line touching
+  REM Check if * to the right, and there is a number following immediately on same line
+  REM Check if * is below, and there is a number immediately preceding on line of asterisk
+  REM Check if * is below, and there is a number immediately following on line of asterisk
+  REM Check if * is below, and there is a number on the third line touching
+  REM Check if * to the left, and there is a number below
+  REM Check if * to the right, and there is a number below
+  REM Check if * is below, and there is a number on my line to the right
 
   g2 = 0
   g3 = 0
   g4 = 0
   g5 = 0
+  g6 = 0
+  g7 = 0
+  g8 = 0
   IF MID(first$, fv+1, 1) = "*" THEN g2 = checkexactstartnum(first$, fv+2)
 
   asterisk = aindex(second$, sv-1, fv+1)
@@ -138,22 +144,30 @@ REM PRINT "Third: " + third$;
   IF asterisk > 0 THEN g4 = checkexactstartnum(second$, asterisk+1)
   IF asterisk > 0 THEN g5 = checkchoicenum(third$, asterisk-1, asterisk, asterisk+1)
 
+  IF MID(first$, sv-1, 1) = "*" THEN g6 = checkchoicenum(second$, sv-2, sv-1, sv)
+  IF MID(first$, fv+1, 1) = "*" THEN g7 = checkchoicenum(second$, fv, fv+1, fv+2)
+  IF MID(second$, fv+1, 1) = "*" THEN g8 = checkexactstartnum(first$, fv+2)
+
   REM If there are 0 adjacent numbers, return 0
 
-  PRINT "Asterisk: " + STR(asterisk);
-  PRINT "G1: " + STR(g1);
-  PRINT "G2: " + STR(g2);
-  PRINT "G3: " + STR(g3);
-  PRINT "G4: " + STR(g4);
-  PRINT "G5: " + STR(g5);
+  REM PRINT "Asterisk: " + STR(asterisk);
+  REM PRINT "G1: " + STR(g1);
+  REM PRINT "G2: " + STR(g2);
+  REM PRINT "G3: " + STR(g3);
+  REM PRINT "G4: " + STR(g4);
+  REM PRINT "G5: " + STR(g5);
+  REM PRINT "G6: " + STR(g6);
+  REM PRINT "G7: " + STR(g7);
+  REM PRINT "G8: " + STR(g8);
 
-  gN = g2+g3+g4+g5
+  gN = g2+g3+g4+g5+g6+g7+g8
   IF gN = 0 THEN RETURN 0
 
   REM If more than 1 set of numbers are adjacent, return 0
 
-  IF gN <> g2 AND gN <> g3 AND gN <> g4 AND gN <> g5 THEN RETURN 0
+  IF gN <> g2 AND gN <> g3 AND gN <> g4 AND gN <> g5 AND gN <> g6 AND gN <> g7 AND gN <> g8 THEN RETURN 0
 
+  PRINT "Gear Ratio: " + STR(g1) + "*" + STR(gN) + " = " + STR(g1*gN);
   RETURN g1*gN
 ENDDEF
 
