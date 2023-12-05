@@ -1,0 +1,48 @@
+#!/bin/env bash
+
+#
+# Seed mapper. 
+# Read info from file of the form:
+# seeds: <seed list>
+# 
+# a-to-b-map:
+# dst src len
+# ...
+# 
+# c-to-d-map:
+# dst src len
+# ...
+#
+# etc.
+#
+# If no mapping provided for a number, number not mapped
+readmap() 
+{
+  mapindex=$1
+
+  title="${rawtext[${mapindex}]}" 
+  done=false
+  while !${done}; do 
+    
+  done
+  return 3
+} 
+
+declare -a map 
+declare -a rawtext
+
+mapfile=$1
+while IFS= read -r line; do
+  rawtext[${i}]="$line"
+  i=$((i+1))
+done < ${mapfile}
+
+#for line in "${rawtext[@]}"; do
+#  echo "${line}"
+#done
+
+set -x
+seeds=${rawtext[0]}
+
+out=$(readmap 2)
+index=$?
