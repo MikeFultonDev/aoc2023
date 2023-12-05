@@ -20,34 +20,60 @@
 # Print out the lowest location number for the input seeds
 # (the location number is the last mapping)
 #
-readmap() 
+rdmap() 
 {
   index=$1
+  shift 1
   mapinput=$*
-  header=$rawtext[${index}]
+
+  local cmap
+  local entrya
+  local header
+  local cindex
+
+  declare -a cmap
+  declare -a entrya
+
+  header=${rawtext[${index}]}
   index=$((index+1))
   line=${rawtext[${index}]}
+  cindex=0
   while ! [ -z "${line}" ]; do
+    cmap[${cindex}]=${line}
     index=$((index+1))
+    cindex=$((cindex+1))
     line=${rawtext[${index}]}
   done
+
+  cindex=0
+  while [ ${cindex} -lt ${#cmap[@]} ]; do
+    entry=${cmap[$cindex]}
+    # Each line is of the form <dst> <src> <len>
+    read -a entrya <<< ${entry}
+    dst=${entrya[0]}
+    src=${entrya[1]}
+    len=${entrya[2]}
+    echo "${dst} ${src} ${len}" >&2
+    cindex=$((cindex+1))
+  done
   echo "1 2 3 4"
-  return $index
+  return $((index+1))
 } 
 
+declare -a rawtext
+
 mapfile=$1
-while IFS= read -r line; do
-  rawtext[${i}]="$line"
-  i=$((i+1))
-done < ${mapfile}
+readarray -t rawtext <${mapfile}
 
 seeds=${rawtext[0]}
 blankline=${rawtext[1]}
 
 map=$(echo $seeds | cut -d' ' -f 2-)
 index=2
-while [ ${index} -lt ${#rawtext[@]} ] ; do
+
+lines=${#rawtext[@]}
+while [ ${index} -lt ${lines} ] ; do
   echo "${map}"
-  map=$(readmap ${index})
+  map=$(rdmap ${index} ${map})
   index=$?
 done
