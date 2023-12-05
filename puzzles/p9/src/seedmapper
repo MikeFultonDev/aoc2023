@@ -45,18 +45,33 @@ rdmap()
     line=${rawtext[${index}]}
   done
 
-  cindex=0
-  while [ ${cindex} -lt ${#cmap[@]} ]; do
-    entry=${cmap[$cindex]}
-    # Each line is of the form <dst> <src> <len>
-    read -a entrya <<< ${entry}
-    dst=${entrya[0]}
-    src=${entrya[1]}
-    len=${entrya[2]}
-    echo "${dst} ${src} ${len}" >&2
-    cindex=$((cindex+1))
+  mapoutput=""
+  for mapin in $mapinput; do
+    cindex=0
+    mapout=''
+    while [ ${cindex} -lt ${#cmap[@]} ]; do
+      entry=${cmap[$cindex]}
+      # Each line is of the form <dst> <src> <len>
+      read -a entrya <<< ${entry}
+      dst=${entrya[0]}
+      src=${entrya[1]}
+      len=${entrya[2]}
+      # echo "${dst} ${src} ${len}" >&2
+      srcend=$((src+len))
+      if [ ${mapin} -ge ${src} ] && [ ${mapin} -lt ${srcend} ]; then
+        offset=$((mapin-src))
+        dstout=$((dst+offset))
+        mapout=${dstout}
+        break
+      fi
+      cindex=$((cindex+1))
+    done
+    if [ -z $mapout ]; then
+      mapout="${mapin}"
+    fi
+    mapoutput="${mapoutput} ${mapout}"
   done
-  echo "1 2 3 4"
+  echo ${mapoutput}
   return $((index+1))
 } 
 
@@ -73,7 +88,8 @@ index=2
 
 lines=${#rawtext[@]}
 while [ ${index} -lt ${lines} ] ; do
-  echo "${map}"
+  #echo "${map}"
   map=$(rdmap ${index} ${map})
   index=$?
 done
+echo "Location: ${map}"
