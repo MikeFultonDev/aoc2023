@@ -13,19 +13,20 @@ class Scratchcard {
     
     String headerAndData[] = this._line.split(":");
     String winnersAndNumbers[] = headerAndData[1].split("\\|");
-    String winners[] = winnersAndNumbers[0].split(" ");
-    String numbers[] = winnersAndNumbers[1].split(" ");
+    String winners[] = winnersAndNumbers[0].trim().split(" ");
+    String numbers[] = winnersAndNumbers[1].trim().split(" ");
 
     // Inefficient loop, but the list is short
     
-    for (String winner : winners) {
-      for (String number : numbers) {
+    for (String number : numbers) {
+      for (String winner : winners) {
         if (number.equals(winner)) {
           if (_points == 0) {
             _points = 1;
           } else {
             _points <<= 1;
           }
+          break;
         }
       }
     }

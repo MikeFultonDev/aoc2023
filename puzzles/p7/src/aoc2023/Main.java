@@ -1,7 +1,7 @@
 package aoc2023;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,10 +26,15 @@ class Main {
 
   private boolean processCards() {
     try {
-      List<String> lines = Files.readAllLines(Paths.get(this._scratchcardFile), java.nio.charset.StandardCharsets.ISO_8859_1);
+      ArrayList<String> lines = new ArrayList<String>();
+      BufferedReader br = new BufferedReader(new FileReader(this._scratchcardFile));
+      String l;
+      while ((l = br.readLine()) != null) {
+        lines.add(l);
+      }
       this._scratchcards = new ArrayList<Scratchcard>();
       for (String line : lines) {
-        this._scratchcards.add(new Scratchcard(new String(line.getBytes(), "IBM-1047")));
+        this._scratchcards.add(new Scratchcard(line));
       }
     } catch (IOException e) {
       System.err.println("Error " + e + " encountered trying to process scratch card file " + this._scratchcardFile);
