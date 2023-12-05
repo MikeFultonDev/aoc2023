@@ -16,20 +16,24 @@
 # etc.
 #
 # If no mapping provided for a number, number not mapped
+#
+# Print out the lowest location number for the input seeds
+# (the location number is the last mapping)
+#
 readmap() 
 {
-  mapindex=$1
-
-  title="${rawtext[${mapindex}]}" 
-  done=false
-  while !${done}; do 
-    
+  index=$1
+  mapinput=$*
+  header=$rawtext[${index}]
+  index=$((index+1))
+  line=${rawtext[${index}]}
+  while ! [ -z "${line}" ]; do
+    index=$((index+1))
+    line=${rawtext[${index}]}
   done
-  return 3
+  echo "1 2 3 4"
+  return $index
 } 
-
-declare -a map 
-declare -a rawtext
 
 mapfile=$1
 while IFS= read -r line; do
@@ -37,12 +41,13 @@ while IFS= read -r line; do
   i=$((i+1))
 done < ${mapfile}
 
-#for line in "${rawtext[@]}"; do
-#  echo "${line}"
-#done
-
-set -x
 seeds=${rawtext[0]}
+blankline=${rawtext[1]}
 
-out=$(readmap 2)
-index=$?
+map=$(echo $seeds | cut -d' ' -f 2-)
+index=2
+while [ ${index} -lt ${#rawtext[@]} ] ; do
+  echo "${map}"
+  map=$(readmap ${index})
+  index=$?
+done
