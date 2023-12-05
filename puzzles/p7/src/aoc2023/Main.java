@@ -29,16 +29,19 @@ class Main {
       List<String> lines = Files.readAllLines(Paths.get(this._scratchcardFile), java.nio.charset.StandardCharsets.ISO_8859_1);
       this._scratchcards = new ArrayList<Scratchcard>();
       for (String line : lines) {
-        this._scratchcards.add(new Scratchcard(line));
+        this._scratchcards.add(new Scratchcard(new String(line.getBytes(), "IBM-1047")));
       }
     } catch (IOException e) {
       System.err.println("Error " + e + " encountered trying to process scratch card file " + this._scratchcardFile);
       return true;
     }
+    for (Scratchcard scratchcard : this._scratchcards) {
+      this._points += scratchcard.getPoints();
+    }
     return false;
   }
   private void printResult() {
-    System.out.printf("Scratch cards are worth %d points\n", this._points);
+    System.out.println("Scratch cards are worth " + this._points + " points");
   }
   private Main(String scratchcardFile) {
     this._scratchcardFile = scratchcardFile;
