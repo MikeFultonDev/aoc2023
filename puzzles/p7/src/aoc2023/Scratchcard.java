@@ -20,7 +20,8 @@ class Scratchcard {
     
     for (String number : numbers) {
       for (String winner : winners) {
-        if (number.equals(winner)) {
+        if (number.equals(winner) && !number.trim().equals("") && !winner.trim().equals("")) {
+          //System.out.println("Number: " + number + " equals: " + winner);
           if (_points == 0) {
             _points = 1;
           } else {
@@ -30,6 +31,7 @@ class Scratchcard {
         }
       }
     }
+    //System.out.println(this._line + " yields: " + this._points);
   }
   private String _line;
   private long _points;
