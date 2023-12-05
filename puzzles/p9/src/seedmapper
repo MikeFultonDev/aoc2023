@@ -93,3 +93,10 @@ while [ ${index} -lt ${lines} ] ; do
   index=$?
 done
 echo "Location: ${map}"
+min="9999999999"
+for loc in ${map}; do
+  if [ ${loc} -lt ${min} ]; then
+    min=${loc}
+  fi
+done
+echo "Minimum: ${min}"
