@@ -1,2 +1,5 @@
 **/a.out
+**/*.lst
+**/*.o
 **/*.class
+**/race
