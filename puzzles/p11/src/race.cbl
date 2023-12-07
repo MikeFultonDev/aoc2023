@@ -10,7 +10,7 @@
         DATA DIVISION.
         FILE SECTION.
         FD INPUT-FILE
-            RECORDING MODE IS V.
+            RECORDING MODE IS F.
          01  INREC.
                05   IN-DATA PIC X(80).
         WORKING-STORAGE SECTION.
