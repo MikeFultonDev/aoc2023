@@ -32,6 +32,21 @@ class Map {
     this._lastLine = curLine;
   }
 
+  int firstDest() {
+    return _mapset.first().dest();
+  }
+  int firstLen() {
+    return _mapset.first().len();
+  }
+
+  int map(int value) {
+    for (MapEntry entry : _mapset) {
+      if (entry.canMap(value)) {
+        return entry.map(value);
+      }
+    }
+    return -1;
+  }
   int lastLine() {
     return _lastLine;
   }

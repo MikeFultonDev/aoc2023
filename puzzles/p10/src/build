@@ -2,7 +2,7 @@
 MYDIR="$(cd "$(dirname "$0")" > /dev/null 2>&1 && pwd -P)"
 export CLASSPATH=$MYDIR
 cd aoc2023
-rm *.class
+rm -f *.class
 javac -Xlint:unchecked -encoding ISO8859-1 Main.java
 
 

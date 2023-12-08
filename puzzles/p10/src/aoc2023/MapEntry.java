@@ -16,7 +16,7 @@ class MapEntry implements java.lang.Comparable<MapEntry> {
     int destStart = this._dest;
     int destEnd = this._dest + this._len;
 
-    return srcStart + "-" + srcEnd + " -> " + destStart + "-" + destEnd;
+    return destStart + "-" + destEnd + " <- " + srcStart + "-" + srcEnd;
   }
 
   MapEntry(String line) throws NumberFormatException {
@@ -26,8 +26,25 @@ class MapEntry implements java.lang.Comparable<MapEntry> {
     this._len = Integer.parseInt(tokens[2]);
   }
 
-  private int dest() {
+  int dest() {
     return _dest;
+  }
+
+  int len() {
+    return _len;
+  }
+
+  boolean canMap(int value) {
+    return (this._dest <= value && value < (this._dest + this._len));
+  }
+
+  int map(int value) {
+    if (!canMap(value)) {
+      System.err.println("oops\n");
+      System.exit(4);
+    }
+    int offset = value - this._dest; 
+    return this._src + offset;
   }
 
   int _len;

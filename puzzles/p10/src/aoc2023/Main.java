@@ -51,9 +51,32 @@ class Main {
       curLine = map.lastLine()+1;
     }
 
-    for (int mapNum = maps.size()-1; mapNum >=0; --mapNum) {
+    int lastMapNum = maps.size()-1;
+    for (int mapNum = lastMapNum; mapNum >=0; --mapNum) {
       Map map = maps.get(mapNum);
       System.out.println(map);
+    }
+
+    Map lastMap = maps.get(lastMapNum);
+    int smallestDest = lastMap.firstDest();
+    int smallestLen = lastMap.firstLen();
+    for (int len=0; len<smallestLen; ++len) {
+      int dest = smallestDest + len;
+      for (int mapNum = lastMapNum; mapNum >=0; --mapNum) {
+        System.out.print(dest + "->");
+        if (dest < 0) {
+          System.out.println(" no map\n");
+          break;
+        }
+        Map map = maps.get(mapNum);
+        dest = map.map(dest);
+      }
+      if (dest >= 0) {
+        System.out.println(" Success\n");
+        break;
+      } else {
+        System.out.println(" no map\n");
+      }
     }
 
     return false;
