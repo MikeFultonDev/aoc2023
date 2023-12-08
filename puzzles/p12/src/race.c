@@ -1,1 +1,60 @@
-{‰•ƒ“¤„…@L¢£„“‰‚Kˆn{‰•ƒ“¤„…@L¢£„‰–Kˆn¢‰‡•…„@“–•‡@ã^@¢‰‡•…„@“–•‡@“–•‡@ƒ“ƒÄ‰¢£•ƒ…M¢‰‡•…„@“–•‡@“–•‡@¢£™£ã‰”…]À@@™…£¤™•@¢£™£ã‰”…@\@ã@`@¢£™£ã‰”…@\@¢£™£ã‰”…^Ğ¢‰‡•…„@“–•‡@“–•‡@”¨¢…™ƒˆM¢‰‡•…„@“–•‡@“–•‡@”‰•k@¢‰‡•…„@“–•‡@“–•‡@¢£™£k@¢‰‡•…„@“–•‡@“–•‡@…•„]@À@@¢‰‡•…„@“–•‡@“–•‡@ƒ¤™^@@¦ˆ‰“…@M…•„`¢£™£@n@ñ]@@@À@@@@ƒ¤™@~@¢£™£@N@MM…•„`¢£™£]@a@ò]^@@@@@¢‰‡•…„@“–•‡@“–•‡@ƒ£¤“@~@ƒ“ƒÄ‰¢£•ƒ…Mƒ¤™]^@@@@—™‰•£†Mƒ¤™z@l““„@¢£™£zl““„@…•„zl““„@”‰•z@l““„@ƒ£¤“z@l““„à•k@ƒ¤™k@¢£™£k@…•„k@”‰•k@ƒ£¤“]^@@@@‰†@Mƒ£¤“@n@”‰•]@À@@@@@@…•„@~@ƒ¤™`ñ^@@@@@Ğ@…“¢…@‰†@Mƒ£¤“@L@”‰•]@À@@@@@@¢£™£@~@ƒ¤™Nñ^@@@@Ğ@…“¢…@‰†@Mƒ£¤“@~~@”‰•]@À@@@@@@™…£¤™•@ƒ¤™Nñ^@@@@Ğ@@Ğ@@‰†@Mƒ“ƒÄ‰¢£•ƒ…M¢£™£]@n@”‰•]@À@@@@™…£¤™•@¢£™£^@@Ğ@…“¢…@‰†@Mƒ“ƒÄ‰¢£•ƒ…M…•„]@n@”‰•]@À@@@@™…£¤™•@…•„^@@Ğ@…“¢…@À@@@@†—™‰•£†M¢£„…™™k@Å™™–™K@Õ…‰£ˆ…™@¢£™£z@l““„@•–™@…•„z@l““„@™…@“™‡…™@£ˆ•@”‰•z@l““„à•k@¢£™£k@…•„k@”‰•]^@@ĞĞ‰•£@”‰•M‰•£@™‡ƒk@ƒˆ™\@™‡¥­½]@À@@¢‰‡•…„@“–•‡@“–•‡@£‰”…^@@¢‰‡•…„@“–•‡@“–•‡@„‰¢£•ƒ…^@@¢‰‡•…„@“–•‡@“–•‡@¥“^@@‰†@M™‡ƒ@Z~@ó]@À@@@@†—™‰•£†M¢£„…™™k@â¨•£§z@l¢@L£‰”…n@L„‰¢£•ƒ…nà•]^@@@@™…£¤™•@ô^@@Ğ@@£‰”…@~@¢£™£–¤““M™‡¥­ñ½k@ÕäÓÓk@ñğ]^@@„‰¢£•ƒ…@~@¢£™£–¤““M™‡¥­ò½k@ÕäÓÓk@ñğ]^@@ã@~@£‰”…^@@a\@â…™ƒˆ@ƒ™–¢¢@ñaò@£ˆ…@™™¨@¢–@£ˆ£@¨–¤@’•–¦@‰£@‰¢@ƒ–•£‰•¤““¨@‰•ƒ™…¢‰•‡@\a@@a\@Ù…¢¤“£@‰¢@•–£@¤¢…†¤“@‚…ƒ¤¢…@¦‰““@“‰’…“¨@•–£@‡…£@•@…§ƒ£@”£ƒˆ@`@•……„@“¢£@†–¤•„@•¤”‚…™@\a@@¥“@~@”¨¢…™ƒˆM„‰¢£•ƒ…k@ğk@ãaò]^@@@@—™‰•£†MÙ•‡…z@l““„@£–@l““„@z@l““„@¦¨¢à•k@¥“k@ã`¥“k@Mã`¥“]@`@¥“@N@ñ]^@@™…£¤™•@ğ^Ğ@
+#include <stdlib.h>
+#include <stdio.h>
+
+signed long T; 
+signed long long calcDistance(signed long long startTime)
+{
+  return startTime * T - startTime * startTime;
+}
+signed long long mysearch(signed long long min, signed long long start, signed long long end) 
+{
+  signed long long cur;
+
+  while (end-start > 1) 
+  {
+    cur = start + ((end-start) / 2); 
+    signed long long actual = calcDistance(cur);
+    printf("cur: %lld start:%lld end:%lld min: %lld actual: %lld\n", cur, start, end, min, actual);
+    if (actual > min) {
+      end = cur-1; 
+    } else if (actual < min) {
+      start = cur+1;
+    } else if (actual == min) {
+      return cur+1;
+    }
+  }
+  if (calcDistance(start) > min) {
+    return start;
+  } else if (calcDistance(end) > min) {
+    return end;
+  } else {
+    fprintf(stderr, "Error. Neither start: %lld nor end: %lld are larger than min: %lld\n", start, end, min);
+  }
+}
+
+
+int main(int argc, char* argv[]) 
+{
+  signed long long time;
+  signed long long distance;
+  signed long long val;
+
+  if (argc != 3) {
+    fprintf(stderr, "Syntax: %s <time> <distance>\n");
+    return 4;
+  }
+
+  time = strtoull(argv[1], NULL, 10);
+  distance = strtoull(argv[2], NULL, 10);
+
+  T = time;
+
+  /* Search across 1/2 the array so that you know it is continually increasing */
+
+  /* Result is not useful because will likely not get an exact match - need last found number */
+
+  val = mysearch(distance, 0, T/2);
+  
+  printf("Range: %lld to %lld : %lld ways\n", val, T-val, (T-val) - val + 1);
+  return 0;
+} 
