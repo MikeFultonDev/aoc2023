@@ -17,6 +17,8 @@ array set cv {
   A 13
 }
 
+array set nc { }
+
 proc sorthand { left right } {
   lassign $left lcards lvalue lbid
   lassign $right rcards rvalue rbid
@@ -91,7 +93,62 @@ proc computebid { cards } {
 }
 
 proc adjustbid { bid cards } {
-  return $bid
+  set jokers $::nc(1)
+  if { $jokers == 0 } {
+    puts "cards: $cards no jokers"
+    return $bid
+  }
+  puts "$jokers jokers"
+
+  # I have at least one joker
+
+  for {set i 2} {$i < 15} {incr i} {
+    set c1 $::nc($i)
+    # With 4 of a kind, it must be one joker, so bump to 5 of a kind (6)
+    if { $c1 == 4 } { 
+      return 6 
+    } 
+
+    # With 3 of a kind, can not be full house (since there are jokers)
+    # so must be 1 or 2 jokers which gives us either 4 of a kind or 5 of a kind
+    if { $c1 == 3 } { 
+      return [ expr $bid + 1 + $jokers ]
+    }
+  }
+
+  for {set i 2} {$i < 15} {incr i} {
+    set c1 $::nc($i)
+    # With a pair, can be one pair or two
+    # If one pair, bump to 3 of a kind, 4 of a kind, 5 of a kind
+    # If two pair, bump to full house, 4 of a kind, 5 of a kind
+    if { $c1 == 2 } { 
+      if { $bid == 1 } {
+        if { $jokers == 1 } {
+          return [ expr $bid + 1 + $jokers ]
+        } else {
+          return [ expr $bid + 2 + $jokers ]
+        }
+      } else {
+        return [ expr $bid + 1 + $jokers ]
+      }
+    }
+  }
+
+  # Only jokers of value
+  # Map to values for 2, 3, 4, 5 of a kind
+  if { $jokers == 1 } {
+    return 1
+  } elseif { $jokers == 2 } {
+    return 3
+  } elseif { $jokers == 3 } {
+    return 5
+  } elseif { $jokers == 4 } {
+    return 6
+  } elseif { $jokers == 5 } {
+    return 6
+  } else {
+    puts "Logic error. Did not expect $jokers"
+  }
 }
 
 if { $argc != 1 } {
