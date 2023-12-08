@@ -3,6 +3,26 @@ import java.util.ArrayList;
 import java.util.TreeSet;
 
 class Map {
+  Map(String seeds) {
+    this._name = "seeds:";
+    this._firstLine = 1;
+    this._lastLine = 1;
+    this._lines = new ArrayList<String>();
+    this._lines.add(seeds);
+
+    // The seed line has multiple ranges on it as pairs
+    // There is no 'source' since this is the first entry
+
+    this._mapset = new TreeSet<MapEntry>();
+    String[] tokens = seeds.split("\\s+");
+
+    // Skip over 'seeds:' header
+    for (int i=1; i<tokens.length; i+=2) {
+      MapEntry mapEntry = new MapEntry(tokens[i], tokens[i+1]);
+      this._mapset.add(mapEntry);
+    }
+  }
+
   Map(int curLine, ArrayList<String> lines) {
     this._firstLine = curLine;
     this._lines = lines;
@@ -22,30 +42,30 @@ class Map {
     }
 
     // Process the mapping information
-    _mapset = new TreeSet<MapEntry>();
+    this._mapset = new TreeSet<MapEntry>();
     while (curLine < _lines.size() && !(this._lines.get(curLine).trim().equals(""))) {
       // Each line has <dest> <src> <len>
       MapEntry mapEntry = new MapEntry(this._lines.get(curLine).trim());
-      _mapset.add(mapEntry);
+      this._mapset.add(mapEntry);
       ++curLine;
     }
     this._lastLine = curLine;
   }
 
-  int firstDest() {
-    return _mapset.first().dest();
+  long firstDest() {
+    return this._mapset.first().dest();
   }
-  int firstLen() {
-    return _mapset.first().len();
+  long firstLen() {
+    return this._mapset.first().len();
   }
 
-  int map(int value) {
-    for (MapEntry entry : _mapset) {
+  long map(long value) {
+    for (MapEntry entry : this._mapset) {
       if (entry.canMap(value)) {
         return entry.map(value);
       }
     }
-    return -1;
+    return value;
   }
   int lastLine() {
     return _lastLine;
@@ -54,11 +74,15 @@ class Map {
     return _name;
   }
 
+  TreeSet<MapEntry> mapset() {
+    return _mapset;
+  }
+
   @Override
   public String toString() {
     StringBuffer out = new StringBuffer(_name);
     out.append("\n  ");
-    for (MapEntry entry : _mapset) {
+    for (MapEntry entry : this._mapset) {
       out = out.append(entry);
       out = out.append("\n  ");
     }

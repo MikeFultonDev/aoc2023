@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 class Main {
   public static void main(String args[]) {
@@ -44,6 +45,8 @@ class Main {
     String seeds = lines.get(0);
     ArrayList<Map> maps = new ArrayList<Map>();
 
+    Map seedMap = new Map(seeds); 
+    maps.add(seedMap);
     int curLine = 1;
     while (curLine < lines.size()) {
       Map map = new Map(curLine, lines);
@@ -51,40 +54,59 @@ class Main {
       curLine = map.lastLine()+1;
     }
 
-    int lastMapNum = maps.size()-1;
-    for (int mapNum = lastMapNum; mapNum >=0; --mapNum) {
+    for (int mapNum = 0; mapNum < maps.size(); ++mapNum) {
       Map map = maps.get(mapNum);
       System.out.println(map);
     }
 
-    Map lastMap = maps.get(lastMapNum);
-    int smallestDest = lastMap.firstDest();
-    int smallestLen = lastMap.firstLen();
-    for (int len=0; len<smallestLen; ++len) {
-      int dest = smallestDest + len;
-      for (int mapNum = lastMapNum; mapNum >=0; --mapNum) {
-        System.out.print(dest + "->");
-        if (dest < 0) {
-          System.out.println(" no map\n");
-          break;
+    // Map the couple numbers
+
+    long winnerSeed=-1;
+    long winnerResult = Long.MAX_VALUE;
+
+    TreeSet<MapEntry> seedEntries = maps.get(0).mapset();
+    for (MapEntry seedEntry : seedEntries) {
+      System.out.println("Processing seed range: " + seedEntry.srcStart() + "-" + seedEntry.srcEnd());
+      for (long seed=seedEntry.srcStart(); seed<seedEntry.srcEnd(); seed += 1000) {
+        long src = seed;
+        for (int mapNum = 0; mapNum < maps.size(); ++mapNum) { 
+          //System.out.print(src + "->");
+          Map map = maps.get(mapNum);
+          src = map.map(src);
         }
-        Map map = maps.get(mapNum);
-        dest = map.map(dest);
+        if (src < winnerResult) {
+          winnerResult = src;
+          winnerSeed = seed;
+        }
+        //System.out.println("\n");
       }
-      if (dest >= 0) {
-        System.out.println(" Success\n");
-        break;
-      } else {
-        System.out.println(" no map\n");
-      }
+      System.out.println("Winner so far: " + winnerSeed + " -> " + winnerResult);
     }
 
+    // Use 'winner so far as starter point and go +/- 1000 from it
+    for (long seed=winnerSeed-1000; seed<winnerSeed+1000; ++seed) {
+      long src = seed;
+      for (int mapNum = 0; mapNum < maps.size(); ++mapNum) { 
+        //System.out.print(src + "->");
+        Map map = maps.get(mapNum);
+        src = map.map(src);
+      }
+      if (src < winnerResult) {
+        winnerResult = src;
+        winnerSeed = seed;
+      }
+    }
+    System.out.println("Refined winner: " + winnerSeed + " -> " + winnerResult);
+
+    _result = "Winner: " + winnerSeed + " -> " + winnerResult;
     return false;
   }
+
   private void printResult() {
-    System.out.println("result");
+    System.out.println(_result);
   }
 
+  private String _result;
   private String _raceFile;
 }
 
