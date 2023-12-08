@@ -18,13 +18,31 @@ array set cv {
 }
 
 proc sorthand { left right } {
-  lassign $left lcards lvalue lrank
-  lassign $right rcards rvalue rrank
+  lassign $left lcards lvalue lbid
+  lassign $right rcards rvalue rbid
 
-  return [expr $lrank - $rrank]
+  if { $lbid != $rbid } {
+    return [expr $lbid - $rbid]
+  }
+
+  # Same bid, so check cards from left to right
+
+  set larr [split "$lcards" ""]
+  set rarr [split "$rcards" ""]
+  set i 0
+  foreach {lcard} $larr {
+    set lv $::cv($lcard)
+    set rcard [lindex $rarr $i]
+    set rv $::cv($rcard)
+    if { $lv != $rv } {
+      return [expr $lv - $rv]
+    }
+    set i [incr i]
+  }
+  return 0
 }
 
-proc computerank { cards } {
+proc computebid { cards } {
   for {set i 0} {$i < 15} {incr i} {
     set nc($i) 0
   }
@@ -35,7 +53,7 @@ proc computerank { cards } {
   }
 
   # Categorize types of hands by simply scanning multiple times.
-  # and return rank. 6 for 5 of a Kind, 5 for 4 of a Kind, ... 1 for One Pair, 0 for High card
+  # and return bid. 6 for 5 of a Kind, 5 for 4 of a Kind, ... 1 for One Pair, 0 for High card
 
   for {set i 0} {$i < 15} {incr i} {
     set c1 $nc($i)
@@ -78,13 +96,20 @@ set f [open $file]
 while {[gets $f line] >= 0} {
     set fields [split $line]
     lassign $fields cards value
-    set rank [computerank $cards]
-    lappend hands [list $cards $value $rank]
+    set bid [computebid $cards]
+    lappend hands [list $cards $value $bid]
 }
 close $f
 
-lsort -command sorthand $hands
+set shands [lsort -command sorthand $hands]
 
-foreach {hand} $hands {
-  puts "${hand}"
+set i 1
+set tot 0
+foreach {hand} $shands {
+  lassign $hand cards value bid
+  set rank [expr $i * $value]
+  puts "Cards: $cards Value: $value Rank: $rank"
+  set tot [expr $tot + $rank]
+  set i [incr i]
 }
+puts "Total Winnings: $tot"
