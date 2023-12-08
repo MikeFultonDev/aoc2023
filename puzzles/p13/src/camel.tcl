@@ -72,9 +72,15 @@ proc computebid { cards } {
       for {set j 0} {$j < 15} {incr j} {
         set c2 $nc($j)
         # If 2 found, two pair
-        if { $c2 == 2 } { return 2 }
+        if { $c2 == 2 } {
+          if { $i != $j } {
+            return 2 
+          }
+        }
         # If 3 found, full house
-        if { $c2 == 3 } { return 4 }
+        if { $c2 == 3 } { 
+          return 4 
+        }
       }
       # Just 2 of a kind
       return 1
@@ -108,7 +114,7 @@ set tot 0
 foreach {hand} $shands {
   lassign $hand cards value bid
   set rank [expr $i * $value]
-  puts "Cards: $cards Value: $value Rank: $rank"
+  puts "Cards: $cards Value: $value Hand Value: $bid Rank: $rank"
   set tot [expr $tot + $rank]
   set i [incr i]
 }
