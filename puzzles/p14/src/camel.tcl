@@ -95,10 +95,10 @@ proc computebid { cards } {
 proc adjustbid { bid cards } {
   set jokers $::nc(1)
   if { $jokers == 0 } {
-    puts "cards: $cards no jokers"
+    #puts "cards: $cards no jokers"
     return $bid
   }
-  puts "$jokers jokers"
+  #puts "$jokers jokers"
 
   # I have at least one joker
 
