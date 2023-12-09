@@ -19,22 +19,18 @@ HELLO   CSECT
 * Body
 * Write Hello World to STDOUT
 *
-        MVC RECORD,=C'Hello World'
+        MVC REC(11),=C'Hello World'
         MVC RECLEN,RECSIZE
-        LA  R15,RECORD
+        LA  R15,REC
         ST  R15,RECADDR
-        CALL BPX1WRT,                                                  +
-               (STDOUT,                                                +
-               RECORD,                                                 +
-               BPXALET,                                                +
-               RECLEN,                                                 +
-               RV,                                                     +
-               RC),                                                    +
-               VL,MF=(E,PLIST)
+        MVC BPXWRTD(BPXWRTZ),BPXWRTM
+        LA  R1,BPXWRTD
+*       LINKX EP=BPX1WRT,PARAM=(R1),VL=1
 
 *
 * Epilog
 *
+        L   R13,SAVEA+4
         STORAGE RELEASE,LENGTH=DYNSIZE,ADDR=(R11)
         RETURN (14,12),RC=0
         LTORG
@@ -45,6 +41,7 @@ STDOUT  DC F'0'
 STDIN   DC F'1'
 STDERR  DC F'2'
 BPXALET DC F'0'
+BPXWRTM LINKX SF=L
 *
 * Dynamic (storage obtain'ed) area
 *
@@ -58,13 +55,17 @@ SAVEA   DS 18F
 * Working storage
 *
 RECSIZE EQU RECEND-*
-RECORD  DS CL80
+REC     DS CL80
 RECLEN  DS F
 RECEND  EQU *
 RECADDR DS A
 RV      DS F
 RC      DS F
 PLIST   DS 10A * Is this enough?
+BPXWRTZ EQU BPXWRTE-*
+BPXWRTD LINKX SF=L
+BPXWRTE EQU *
+*
 *
 * End of working storage
 *
