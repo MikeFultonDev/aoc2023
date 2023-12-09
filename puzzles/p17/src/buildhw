@@ -1,0 +1,2 @@
+as -mlist hw.asm >hw.lst
+ld hw.o
