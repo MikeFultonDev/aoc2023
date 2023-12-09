@@ -1,0 +1,3 @@
+#!/bin/sh
+
+php -f hw.php $1
