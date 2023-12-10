@@ -16,6 +16,8 @@ our $bl = 'L';
 our $br = 'J';
 our $s = 'S';
 
+our $ds = 'S';
+our $de = 'E';
 our $du = 'U';
 our $dd = 'D';
 our $dl = 'L';
@@ -42,32 +44,45 @@ sub nextChoice {
 
   my $c = $matrix[$row][$col];
 
-  if (($dir ne $dd) {
+  if ($dir eq $du || $dir eq $ds) {
     my $up = $matrix[$row-1][$col];
-    if (($up eq $v) || ($up eq $ul)) {
+    if ($up eq $s) {
+      return ($row-1, $col, $de);
+    }
+    if (($up eq $v) || ($up eq $ul) || ($up eq $ur)) {
       if ($up eq $v) {
         $dir = $du;
+      } elsif ($up eq $ul) {
+        $dir = $dr;
       } else {
         $dir = $dl;
       }
-      return ($row-1, $col);
+      return ($row-1, $col, $dir);
     }
   }
 
-  if (($dir ne $dd) {
+  if ($dir eq $dd || $dir eq $ds) {
     my $down = $matrix[$row+1][$col];
-    if (($down eq $v) || ($down eq $bl)) {
+    if ($down eq $s) {
+      return ($row+1, $col, $de);
+    }
+    if (($down eq $v) || ($down eq $bl) || ($down eq $br)) {
       if ($down eq $v) {
         $dir = $dd;
-      } else {
+      } elsif ($down eq $bl) {
         $dir = $dr;
+      } else {
+        $dir = $dl;
       }
-      return ($row+1, $col);
+      return ($row+1, $col, $dir);
     }
   }
 
-  if ($dir ne $dl) {
+  if ($dir eq $dr || $dir eq $ds) {
     my $right = $matrix[$row][$col+1];
+    if ($right eq $s) {
+      return ($row, $col+1, $de);
+    }
     if (($right eq $h) || ($right eq $ur) || ($right eq $br)) {
       if ($right eq $h) {
         $dir = $dr;
@@ -76,12 +91,15 @@ sub nextChoice {
       } else {
         $dir = $du;
       }
-      return ($row, $col+1);
+      return ($row, $col+1, $dir);
     }
   }
 
-  if ($dir ne $dr) {
+  if ($dir eq $dl || $dir eq $ds) {
     my $left = $matrix[$row][$col-1];
+    if ($left eq $s) {
+      return ($row, $col-1, $de);
+    }
     if (($left eq $h) || ($left eq $ul) || ($left eq $bl)) {
       if ($left eq $h) {
         $dir = $dl;
@@ -90,11 +108,11 @@ sub nextChoice {
       } else {
         $dir = $du;
       }
-      return ($row, $col-1);
+      return ($row, $col-1, $dir);
     }
   }
 
-  say "Stuck at [$row . $col]";
+  say "Stuck at [$row . $col . $dir]";
   exit 8;
 }
 
@@ -146,7 +164,7 @@ addLine($row, $edge);
 
 say "Start point is [$startrow . $startcol]";
 
-my $dir = ''
+my $dir = $ds;
 
 ($row, $col, $dir) = nextChoice($startrow, $startcol, $dir);
 
