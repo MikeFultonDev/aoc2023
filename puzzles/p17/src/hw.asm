@@ -2,6 +2,7 @@
 * BPX1RED: https://tech.mikefulton.ca/bpx1red
 * HL/ASM 'RENT' https://tech.mikefulton.ca/asmrentvideo
 * BPX Service call: https://tech.mikefulton.ca/callbpxsvc
+* 
         PRINT ON,GEN,DATA
 HELLO   CSECT
 HELLO   RMODE ANY
@@ -12,21 +13,26 @@ HELLO   AMODE 31
         SAVE (14,12)
         BASR R12,0
         USING *,R12
-        STORAGE OBTAIN,LENGTH=DYNSIZE,ADDR=(R11)
+        STORAGE OBTAIN,LENGTH=DYNL,ADDR=(R11)
         USING DYNAREA,R11
-        LA R2,SAVEA
+
+        LA R2,DSA
         ST R2,8(,R13)
-        ST R13,SAVEA+4
+        ST R13,DSA+4
         LR R13,R2
 *
 * Body
 * Write Hello World to STDOUT
 *
+
+*
+* Store values into parameter list
+*
         MVC REC(HWL),HW
         LA  R1,REC
         ST  R1,RECA
         LA  R1,HWL
-        ST  R1,RECLEN
+        ST  R1,RECL
         L   R1,STDOUT
         ST  R1,FD
         L   R1,BPXALET
@@ -35,21 +41,31 @@ HELLO   AMODE 31
         CALL  BPX1WRT,(FD,                                             x
                RECA,                                                   x
                ALET,                                                   x
-               RECLEN,                                                 x
+               RECL,                                                   x
                RV,                                                     x
                RC,                                                     x
                RN),MF=(E,BPXWRTD)
 
-*       ST  0,0(,0)
         L   R8,RV
         L   R9,RC
         L   R10,RN
 *
 * Epilog
 *
-        L   R13,SAVEA+4
-        STORAGE RELEASE,LENGTH=DYNSIZE,ADDR=(R11)
+        L   R13,DSA+4
+        STORAGE RELEASE,LENGTH=DYNL,ADDR=(R11)
         RETURN (14,12),RC=0
+
+*
+* Statics, Dynamic Storage, Equates follows
+* 
+* Naming convention:
+* Suffixes:
+*  L : length
+*  S : static
+*  D : dynamic
+*  A : address
+
         LTORG
 *
 * Statics (constants)
@@ -60,20 +76,22 @@ STDERR  DC F'2'
 BPXALET DC F'0'
 BPX1WRT DC V(BPX1WRT)
 
-DCALL   CALL  ,(0,0,0,0,0,0,0),MF=L
-BPXWRTL EQU *-DCALL
+BPXWRTS CALL  ,(0,0,0,0,0,0,0),MF=L
+BPXWRTL EQU *-BPXWRTS
 
 HW      DC C'Hello World'
+NEWLINE DC X'15'
 HWL     EQU *-HW
+
 *
 * Dynamic (storage obtain'ed) area
 *
 DYNAREA DSECT
-DYNSIZE EQU DYNEND-*
 *
-* Stack save area always first
+* Dynamic Save Area regs always first
 *
-SAVEA   DS 18F
+DSA   DS 18F
+
 *
 * Working storage
 *
@@ -85,16 +103,17 @@ RECEND  EQU *
 RECA    DS  A
 BPXWRTD DS  CL(BPXWRTL)
 ALET    DS  F
-RECLEN  DS  F
+RECL    DS  F
 RV      DS  F
 RC      DS  F
 RN      DS  F
 
+DYNL EQU *-DYNAREA
 *
 *
 * End of working storage
 *
-DYNEND  EQU *
+
 *
 * Equates
 *
