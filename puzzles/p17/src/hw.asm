@@ -1,8 +1,11 @@
 * BPX1WRT: https://tech.mikefulton.ca/bpx1wrt
 * BPX1RED: https://tech.mikefulton.ca/bpx1red
 * HL/ASM 'RENT' https://tech.mikefulton.ca/asmrentvideo
+* BPX Service call: https://tech.mikefulton.ca/callbpxsvc
         PRINT ON,GEN,DATA
 HELLO   CSECT
+HELLO   RMODE ANY
+HELLO   AMODE 31
 * 
 * Prolog
 *
@@ -19,14 +22,28 @@ HELLO   CSECT
 * Body
 * Write Hello World to STDOUT
 *
-        MVC REC(11),=C'Hello World'
-        MVC RECLEN,RECSIZE
-        LA  R15,REC
-        ST  R15,RECADDR
-        MVC BPXWRTD(BPXWRTZ),BPXWRTM
-        LA  R1,BPXWRTD
-*       LINKX EP=BPX1WRT,PARAM=(R1),VL=1
+        MVC REC(HWL),HW
+        LA  R1,REC
+        ST  R1,RECA
+        LA  R1,HWL
+        ST  R1,RECLEN
+        L   R1,STDOUT
+        ST  R1,FD
+        L   R1,BPXALET
+        ST  R1,ALET
 
+        CALL  BPX1WRT,(FD,                                             x
+               RECA,                                                   x
+               ALET,                                                   x
+               RECLEN,                                                 x
+               RV,                                                     x
+               RC,                                                     x
+               RN),MF=(E,BPXWRTD)
+
+*       ST  0,0(,0)
+        L   R8,RV
+        L   R9,RC
+        L   R10,RN
 *
 * Epilog
 *
@@ -37,11 +54,17 @@ HELLO   CSECT
 *
 * Statics (constants)
 *
-STDOUT  DC F'0'
-STDIN   DC F'1'
+STDIN   DC F'0'
+STDOUT  DC F'1'
 STDERR  DC F'2'
 BPXALET DC F'0'
-BPXWRTM LINKX SF=L
+BPX1WRT DC V(BPX1WRT)
+
+DCALL   CALL  ,(0,0,0,0,0,0,0),MF=L
+BPXWRTL EQU *-DCALL
+
+HW      DC C'Hello World'
+HWL     EQU *-HW
 *
 * Dynamic (storage obtain'ed) area
 *
@@ -54,17 +77,19 @@ SAVEA   DS 18F
 *
 * Working storage
 *
+FD      DS  F
+
 RECSIZE EQU RECEND-*
 REC     DS CL80
-RECLEN  DS F
 RECEND  EQU *
-RECADDR DS A
-RV      DS F
-RC      DS F
-PLIST   DS 10A * Is this enough?
-BPXWRTZ EQU BPXWRTE-*
-BPXWRTD LINKX SF=L
-BPXWRTE EQU *
+RECA    DS  A
+BPXWRTD DS  CL(BPXWRTL)
+ALET    DS  F
+RECLEN  DS  F
+RV      DS  F
+RC      DS  F
+RN      DS  F
+
 *
 *
 * End of working storage

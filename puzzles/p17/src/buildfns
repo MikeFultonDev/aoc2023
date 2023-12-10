@@ -1,0 +1,2 @@
+as -mlist fns.asm >fns.lst
+ld -S "//'SYS1.CSSLIB'" fns.o

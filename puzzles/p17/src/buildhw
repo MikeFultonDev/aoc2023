@@ -1,2 +1,2 @@
 as -mlist hw.asm >hw.lst
-ld hw.o
+ld -S "//'SYS1.CSSLIB'" hw.o
