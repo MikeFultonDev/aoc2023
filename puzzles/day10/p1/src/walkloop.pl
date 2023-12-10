@@ -16,6 +16,11 @@ our $bl = 'L';
 our $br = 'J';
 our $s = 'S';
 
+our $du = 'U';
+our $dd = 'D';
+our $dl = 'L';
+our $dr = 'R';
+
 #
 # Make the matrix global - this is a simple program
 #
@@ -33,13 +38,64 @@ our $startrow = 0;
 # At the start, there will be 2 ways to being. Choose up over down and right over left
 #
 sub nextChoice {
-  my ($row, $col) = @_;
-
-  say "Next choice is [$row . $col]";
+  my ($row, $col, $dir) = @_;
 
   my $c = $matrix[$row][$col];
 
-  return ($row, $col);
+  if (($dir ne $dd) {
+    my $up = $matrix[$row-1][$col];
+    if (($up eq $v) || ($up eq $ul)) {
+      if ($up eq $v) {
+        $dir = $du;
+      } else {
+        $dir = $dl;
+      }
+      return ($row-1, $col);
+    }
+  }
+
+  if (($dir ne $dd) {
+    my $down = $matrix[$row+1][$col];
+    if (($down eq $v) || ($down eq $bl)) {
+      if ($down eq $v) {
+        $dir = $dd;
+      } else {
+        $dir = $dr;
+      }
+      return ($row+1, $col);
+    }
+  }
+
+  if ($dir ne $dl) {
+    my $right = $matrix[$row][$col+1];
+    if (($right eq $h) || ($right eq $ur) || ($right eq $br)) {
+      if ($right eq $h) {
+        $dir = $dr;
+      } elsif ($right eq $ur) {
+        $dir = $dd;
+      } else {
+        $dir = $du;
+      }
+      return ($row, $col+1);
+    }
+  }
+
+  if ($dir ne $dr) {
+    my $left = $matrix[$row][$col-1];
+    if (($left eq $h) || ($left eq $ul) || ($left eq $bl)) {
+      if ($left eq $h) {
+        $dir = $dl;
+      } elsif ($left eq $ul) {
+        $dir = $dd;
+      } else {
+        $dir = $du;
+      }
+      return ($row, $col-1);
+    }
+  }
+
+  say "Stuck at [$row . $col]";
+  exit 8;
 }
 
 sub addLine {
@@ -90,12 +146,15 @@ addLine($row, $edge);
 
 say "Start point is [$startrow . $startcol]";
 
-($row, $col) = nextChoice($startrow, $startcol);
+my $dir = ''
+
+($row, $col, $dir) = nextChoice($startrow, $startcol, $dir);
 
 my $count = 0;
 while ($matrix[$row][$col] ne $s) {
+  say "Next choice is [$row . $col . $dir]";
   $count = $count+1;
-  ($row, $col) = nextChoice($row, $col);
+  ($row, $col, $dir) = nextChoice($row, $col, $dir);
 }
 
 close(FH);
