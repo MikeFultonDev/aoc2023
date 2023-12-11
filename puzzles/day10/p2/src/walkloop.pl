@@ -2,19 +2,21 @@
 use feature 'say';
 use warnings;
 use strict;
+use v5.10;
 
 # 
 # Symbols in the matrix.
 # Use global variables since the characters are confusing
 #
 
-our $v  = '|';
-our $ul = 'F';
-our $h  = '-';
-our $ur = '7';
-our $bl = 'L';
-our $br = 'J';
-our $s = 'S';
+our $v  = '|'; our $av  = '║';  
+our $ul = 'F'; our $aul = '╔';
+our $h  = '-'; our $ah  = '═';
+our $ur = '7'; our $aur = '╗';
+our $bl = 'L'; our $abl = '╚';
+our $br = 'J'; our $abr = '╝';
+our $s  = 'S';
+our $x  = '.';
 
 our $ds = 'S';
 our $de = 'E';
@@ -131,6 +133,45 @@ sub addLine {
   } 
 }
 
+sub otherPathChar {
+  my ($c) = @_;
+
+  given($c) {
+    when($v)   { return $av;  }
+    when($ul)  { return $aul; }
+    when($h)   { return $ah;  }
+    when($ur)  { return $aur; }
+    when($bl)  { return $abl; }
+    when($br)  { return $abr; }
+    when($av)  { return $v;   }
+    when($aul) { return $ul;  }
+    when($ah)  { return $h;   }
+    when($aur) { return $ur;  }
+    when($abl) { return $bl;  }
+    when($abr) { return $br;  }
+  }
+}
+
+sub clearOriginalPathChar {
+  my ($numrows, $numcols) = @_;
+  for (my $row = 0; $row < $numrows; ++$row) {
+    for (my $col = 0; $col < $numcols; ++$col) {
+      my $c = $matrix[$row][$col];
+      $c =~ s/([\\$v\\$ul\\$h\\$ur\\$bl\\$br])/./g;
+      $matrix[$row][$col] = $c;
+    }
+  }
+}
+
+sub printMatrix {
+  my $row=0;
+  my $col=0;
+
+  foreach my $line (@matrix) {
+    print join("", @{$line}), "\n";
+  }
+}
+
 my $args = $#ARGV + 1;
 
 if ($args < 1) {
@@ -146,12 +187,17 @@ my $row = 0;
 my $col = 0;
 
 my $edge = '';
+my $numcols = 0;
+
 while (<FH>) {
   my $line = $_;
 
+  # Remove leading/trailing spaces
+  $line =~ s/^\s+|\s+$//g ;
+
   if ($edge eq '') {
-    my $size = length($line);
-    $edge = '.' x $size;
+    $numcols = length($line)+2;
+    $edge = '.' x $numcols;
     addLine($row, $edge);
     $row = $row+1;
   }
@@ -161,6 +207,7 @@ while (<FH>) {
   $row = $row+1;
 }
 addLine($row, $edge);
+my $numrows = $row;
 
 say "Start point is [$startrow . $startcol]";
 
@@ -172,10 +219,21 @@ my $count = 0;
 while ($matrix[$row][$col] ne $s) {
   say "Next choice is [$row . $col . $dir]";
   $count = $count+1;
+  my $prevrow = $row;
+  my $prevcol = $col;
   ($row, $col, $dir) = nextChoice($row, $col, $dir);
+
+  $matrix[$prevrow][$prevcol] = otherPathChar($matrix[$prevrow][$prevcol]);
 }
 
 my $farthest = $count/2;
+
+printMatrix();
+
+clearOriginalPathChar($numrows, $numcols);
+
+printMatrix();
+
 say "Loop walk was $count steps. Farthest point away is $farthest";
 
 close(FH);

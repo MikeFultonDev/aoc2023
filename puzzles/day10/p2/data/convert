@@ -1,0 +1,14 @@
+#!/bin/bash
+if [ $# -lt 2 ]; then
+  echo "$0 <input> <output>\n" >&2
+  exit 4
+fi
+
+in=$1
+out=$2
+sed -e 's/F/╔/g' $1 >$2
+sed -i -e 's/-/═/g' $2
+sed -i -e 's/7/╗/g' $2
+sed -i -e 's/|/║/g' $2
+sed -i -e 's/L/╚/g' $2
+sed -i -e 's/J/╝/g' $2
