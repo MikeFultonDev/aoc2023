@@ -1,1 +1,13 @@
-{Za‚‰•a¢ˆ¢…£@`…”¨ˆ“˜~[Mˆ“˜]”¨„‰™~[Mƒ„@[M„‰™•”…@[ð]@n@a„…¥a•¤““@ònPñ@PP@—¦„@`×]„™”@`†@[À”¨ˆ“˜ÐK¤¢…™K“–„„£–¤ƒˆ@`™¤@[À”¨ˆ“˜ÐK¤¢…™K“–„…§—–™£@âãÅ×ÓÉÂ~ÉÇèKåöÙôÔðKâÉÇèÃÖÔ×zÉÇèKåöÙôÔðKâÉÇèÓÉÂƒ–‚ò@`–™ƒ…@™ƒ…Kƒ‚“„ƒ—@[À”¨„‰™Ða™ƒ…@[À”¨ˆ“˜ÐK¤¢…™K“–„M™ƒ…]™”@`†@[À”¨„‰™Ða™ƒ…
+#!/bin/sh
+set -e
+myhlq=$(hlq)
+mydir="$(cd "$(dirname "$0")" > /dev/null 2>&1 && pwd -P)"
+
+drm -f "${myhlq}.user.load"
+dtouch -ru "${myhlq}.user.load"
+
+export STEPLIB=IGY.V6R4M0.SIGYCOMP:IGY.V6R4M0.SIGYLIB
+cob2 -orace race.cbl
+
+dcp "${mydir}/race" "${myhlq}.user.load(race)"
+rm -f "${mydir}/race"

@@ -1,1 +1,34 @@
-{Za‚‰•a¢ˆ¢…£@`…{{@Õ……„@£–@™¤•@}™ƒ…}@—™–‡™”@‰•@Ôåâ@{{{@Æ‰™¢£k@ƒ–—¨@£ˆ…@†‰“…@‰•k@•„@„–•}£@†–™‡…£@£–@‰ƒ–•¥@‰£@£–@ÅÂÃÄÉÃ{‰†@­@[{@`•…@ñ@½^@£ˆ…•@@…ƒˆ–@â¨•£§z@[ğ@L‰•—¤£nà•@nPò@@…§‰£@ô†‰‰†@Z@­@`…@[ñ@½^@£ˆ…•@@…ƒˆ–@ä•‚“…@£–@†‰•„@£…§£@†‰“…z@[ñ@nPò@@…§‰£@ø†‰‚¢…~[M‚¢…•”…@[ñ]”…”~[À‚¢…llK\Ğ‰ƒ–•¥@`†@ÉâÖøøõù`ñ@`£@ÉÂÔ`ñğô÷@L[ñ@na£”—a[[K£§£”¨ˆ“˜~[Mˆ“˜]„™”@`†@[À”¨ˆ“˜ĞKÙÁÃÅKãçã@„£–¤ƒˆ@`™†‚@`“øğ@[À”¨ˆ“˜ĞKÙÁÃÅKãçã„ƒ—@a£”—a[[K£§£@[À”¨ˆ“˜ĞKÙÁÃÅKãçãM[À”…”Ğ]{{@Ù¤•@£ˆ…@—™–‡™”@¦‰£ˆ@”¥¢ƒ”„K@ãˆ…@ÄÄ•”…@ÉÕ×äã@¢¨¢@¦ˆ…™…@£–@™…„@„£@†™–”{”¥¢ƒ”„@``—‡”~™ƒ…@``¢£…—“‰‚~[À”¨ˆ“˜ĞKäâÅÙKÓÖÁÄ@``‰•—¤£~[À”¨ˆ“˜ĞKÙÁÃÅKãçãM[À”…”Ğ]
+#!/bin/sh
+set -e
+#
+# Need to run 'race' program in MVS 
+#
+
+#
+# First, copy the file in, and don't forget to iconv it to EBCDIC
+#
+
+if [ $# -ne 1 ]; then
+  echo "Syntax: $0 <input>\n" >&2
+  exit 4
+fi
+
+if ! [ -e $1 ]; then
+  echo "Unable to find text file: $1" >&2
+  exit 8
+fi
+base=$(basename $1)
+mem=${base%%.*}
+
+iconv -f ISO8859-1 -t IBM-1047 <$1 >/tmp/$$.txt
+
+myhlq=$(hlq)
+drm -f "${myhlq}.RACE.TXT" 
+dtouch -rfb -l80 "${myhlq}.RACE.TXT"
+dcp /tmp/$$.txt "${myhlq}.RACE.TXT(${mem})"
+
+#
+# Run the program with mvscmd. The DDname INPUT says where to read data from
+#
+
+mvscmd --pgm=race --steplib="${myhlq}.USER.LOAD" --input="${myhlq}.RACE.TXT(${mem})"
