@@ -17,6 +17,7 @@ our $bl = 'L'; our $abl = '╚';
 our $br = 'J'; our $abr = '╝';
 our $s  = 'S';
 our $x  = '.';
+our $i  = 'I';
 
 our $ds = 'S';
 our $de = 'E';
@@ -42,7 +43,7 @@ our $startrow = 0;
 # At the start, there will be 2 ways to being. Choose up over down and right over left
 #
 sub nextChoice {
-  my ($row, $col, $dir) = @_;
+  my ($row, $col, $dir, $clean) = @_;
 
   my $c = $matrix[$row][$col];
 
@@ -58,6 +59,9 @@ sub nextChoice {
         $dir = $dr;
       } else {
         $dir = $dl;
+      }
+      if ($clean == 1 && $matrix[$row][$col-1] eq $x) {
+        $matrix[$row][$col-1] = $i;
       }
       return ($row-1, $col, $dir);
     }
@@ -76,6 +80,9 @@ sub nextChoice {
       } else {
         $dir = $dl;
       }
+      if ($clean == 1 && $matrix[$row][$col+1] eq $x) {
+        $matrix[$row][$col+1] = $i;
+      }
       return ($row+1, $col, $dir);
     }
   }
@@ -93,6 +100,9 @@ sub nextChoice {
       } else {
         $dir = $du;
       }
+      if ($clean == 1 && $matrix[$row-1][$col] eq $x) {
+        $matrix[$row-1][$col] = $i;
+      }
       return ($row, $col+1, $dir);
     }
   }
@@ -109,6 +119,9 @@ sub nextChoice {
         $dir = $dd;
       } else {
         $dir = $du;
+      }
+      if ($clean == 1 && $matrix[$row+1][$col] eq $x) {
+        $matrix[$row+1][$col] = $i;
       }
       return ($row, $col-1, $dir);
     }
@@ -149,6 +162,7 @@ sub otherPathChar {
     when($aur) { return $ur;  }
     when($abl) { return $bl;  }
     when($abr) { return $br;  }
+    default:   { return $c;   }
   }
 }
 
@@ -157,7 +171,21 @@ sub clearOriginalPathChar {
   for (my $row = 0; $row < $numrows; ++$row) {
     for (my $col = 0; $col < $numcols; ++$col) {
       my $c = $matrix[$row][$col];
-      $c =~ s/([\\$v\\$ul\\$h\\$ur\\$bl\\$br])/./g;
+
+      # Put dash ($h) at end so it does not get mis-interpreted as range
+      $c =~ s/([$v$ul$ur$bl$br$h])/$x/g;
+      $matrix[$row][$col] = $c;
+    }
+  }
+}
+
+sub switchPathChar {
+  my ($numrows, $numcols) = @_;
+  for (my $row = 0; $row < $numrows; ++$row) {
+    for (my $col = 0; $col < $numcols; ++$col) {
+      my $c = $matrix[$row][$col];
+
+      $c = otherPathChar($c);
       $matrix[$row][$col] = $c;
     }
   }
@@ -213,15 +241,15 @@ say "Start point is [$startrow . $startcol]";
 
 my $dir = $ds;
 
-($row, $col, $dir) = nextChoice($startrow, $startcol, $dir);
+my $clean = 0;
+($row, $col, $dir) = nextChoice($startrow, $startcol, $dir, $clean);
 
 my $count = 0;
 while ($matrix[$row][$col] ne $s) {
-  say "Next choice is [$row . $col . $dir]";
   $count = $count+1;
   my $prevrow = $row;
   my $prevcol = $col;
-  ($row, $col, $dir) = nextChoice($row, $col, $dir);
+  ($row, $col, $dir) = nextChoice($row, $col, $dir, $clean);
 
   $matrix[$prevrow][$prevcol] = otherPathChar($matrix[$prevrow][$prevcol]);
 }
@@ -230,8 +258,37 @@ my $farthest = $count/2;
 
 printMatrix();
 
+#
+# Clear the broken pipes on the ground
+#
 clearOriginalPathChar($numrows, $numcols);
 
+printMatrix();
+
+#
+# Switch the pipe characters back again
+#
+switchPathChar($numrows, $numcols);
+
+printMatrix();
+
+$matrix[$startrow][$startcol] = $s;
+$dir = $ds;
+($row, $col, $dir) = nextChoice($startrow, $startcol, $dir, $clean);
+$clean = 1;
+
+while ($matrix[$row][$col] ne $s) {
+  say "Next choice is [$row . $col . $dir]";
+  $count = $count+1;
+  my $prevrow = $row;
+  my $prevcol = $col;
+  ($row, $col, $dir) = nextChoice($row, $col, $dir, $clean);
+}
+
+#
+# Switch the pipe characters back again
+#
+switchPathChar($numrows, $numcols);
 printMatrix();
 
 say "Loop walk was $count steps. Farthest point away is $farthest";
