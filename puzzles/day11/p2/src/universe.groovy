@@ -86,10 +86,61 @@ def basicPathLength(matrix, colStart, rowStart, colEnd, rowEnd) {
 }
 
 def pathAdjustColThenRow(matrix, colA, rowA, colB, rowB) {
-  return 0
+  def tmp
+  if (colA > colB) {
+    tmp = colA
+    colA = colB
+    colB = tmp
+  }
+  if (rowA > rowB) {
+    tmp = rowA
+    rowA = rowB
+    rowB = tmp
+  }
+
+  def col
+  def row
+  def expansion = 0
+  for (col = colA; col < colB; ++col) {
+    if (matrix[col][rowA] == C.EXPAND) {
+      expansion += C.EXPAND_ADJUSTMENT
+    }
+  }
+  for (row = rowA+1; row < rowB; ++row) {
+    if (matrix[colB][row] == C.EXPAND) {
+      expansion += C.EXPAND_ADJUSTMENT
+    }
+  }
+  return expansion
 }
+
 def pathAdjustRowThenCol(matrix, colA, rowA, colB, rowB) {
-  return 0
+  def tmp
+  if (colA > colB) {
+    tmp = colA
+    colA = colB
+    colB = tmp
+  }
+  if (rowA > rowB) {
+    tmp = rowA
+    rowA = rowB
+    rowB = tmp
+  }
+
+  def col
+  def row
+  def expansion = 0
+  for (row = rowA; row < rowB; ++row) {
+    if (matrix[colA][row] == C.EXPAND) {
+      expansion += C.EXPAND_ADJUSTMENT
+    }
+  }
+  for (col = colA; col < colB; ++col) {
+    if (matrix[col][rowB] == C.EXPAND) {
+      expansion += C.EXPAND_ADJUSTMENT
+    }
+  }
+  return expansion
 }
 
 def computeLengthColRow(matrix, col, row, cols, rows, pathLengths) {
