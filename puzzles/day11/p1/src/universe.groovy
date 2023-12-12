@@ -5,7 +5,7 @@ if (args.length < 1) {
 String file = args[0]
 
 def BLANK='.'
-def HASH='#'
+def GALAXY='#'
 def cols=0
 def rows=0
 def col=0
@@ -19,7 +19,7 @@ def printMatrix(matrix, rows, cols) {
 
   for (row = 0; row < rows; ++row) {
     for (col = 0; col < cols; ++col) {
-      print matrix[row][col]
+      print matrix[col][row]
     }
     println ""
   }
@@ -28,14 +28,14 @@ def printMatrix(matrix, rows, cols) {
 def copyrow(inMatrix, outMatrix, inRow, outRow, cols) {
   def col
   for (col = 0; col < cols; ++col) {
-    outMatrix[outRow][col] = inMatrix[inRow][col]
+    outMatrix[col][outRow] = inMatrix[col][inRow]
   }
 }
   
 def copycol(inMatrix, outMatrix, inCol, outCol, rows) {
   def row
   for (row = 0; row < rows; ++row) {
-    outMatrix[row][outCol] = inMatrix[row][inCol]
+    outMatrix[outCol][row] = inMatrix[inCol][row]
   }
 }
 
@@ -43,7 +43,7 @@ def determinePairs(matrix, rows, cols, symbol) {
   def count = 0;
   for (row=0; row<rows; ++row) {
     for (col=0; col<cols; ++col) {
-      if (matrix[row][col] == symbol) {
+      if (matrix[col][row] == symbol) {
         ++count;
       }
     }
@@ -64,17 +64,17 @@ for (row=0; row<rows; ++row) {
     def aLine = lines.get(row).split('')
     if (cols == 0) {
       cols = aLine.length
-      matrix = new String[rows][cols]
-      expandedRowMatrix = new String[rows*2][cols*2]
-      expandedColMatrix = new String[rows*2][cols*2]
+      matrix = new String[cols][rows]
+      expandedRowMatrix = new String[cols*2][rows*2]
+      expandedColMatrix = new String[cols*2][rows*2]
     }
     col = 0
     for (String entry : aLine) {
-      matrix[row][col++] = entry;
+      matrix[col++][row] = entry;
     }
 }
 
-printMatrix(matrix, rows, cols)
+//printMatrix(matrix, rows, cols)
 
 // 
 // Walk through the array - first by rows and then
@@ -84,7 +84,7 @@ def expandedRow = 0;
 for (row = 0; row < rows; ++row) {
   def allblank = true
   for (col = 0; col < cols; ++col) {
-    if (matrix[row][col] != BLANK) {
+    if (matrix[col][row] != BLANK) {
       allblank = false
       break
     }
@@ -95,13 +95,13 @@ for (row = 0; row < rows; ++row) {
   }
 }
 def expandedRows = expandedRow
-printMatrix(expandedRowMatrix, expandedRows, cols)
+//printMatrix(expandedRowMatrix, expandedRows, cols)
 
 def expandedCol = 0;
 for (col = 0; col < cols; ++col) {
   def allblank = true
   for (row = 0; row < expandedRows; ++row) {
-    if (expandedRowMatrix[row][col] != BLANK) {
+    if (expandedRowMatrix[col][row] != BLANK) {
       allblank = false
       break
     }
@@ -113,12 +113,58 @@ for (col = 0; col < cols; ++col) {
 }
 def expandedCols = expandedCol
 
-printMatrix(expandedColMatrix, expandedRows, expandedCols)
 
 matrix = expandedColMatrix
 rows = expandedRows
 cols = expandedCols
 
-numPairs = determinePairs(matrix, rows, cols, HASH)
+printMatrix(matrix, rows, cols)
+numPairs = determinePairs(matrix, rows, cols, GALAXY)
 
 println "Process " + numPairs + " pairs"
+
+//
+// Walk through the matrix. The outer loop will find the next
+// galaxy, and the inner loop will then find all the galaxies
+// it can pair with, summing up the shortest paths
+//
+
+def pathLengthTotal = 0
+def innerRowStart
+for (col = 0; col < cols; ++col) {
+  for (row = 0; row < rows; ++row) {
+    if (matrix[col][row] == GALAXY) {
+      // Start inner loop from the next location on
+      def innerRowFirst=row+1
+      def innerColStart=col
+      if (innerRowFirst == rows) {
+        innerColStart = col+1 
+        innerRowFirst = 0
+      }
+      def innerCol
+      def innerRow
+      innerRowStart = innerRowFirst
+      //println "cols from " + innerColStart + " to " + cols + " and rows " + innerRowStart + " to " + rows
+      for (innerCol = innerColStart; innerCol < cols; ++innerCol) {
+        for (innerRow = innerRowStart; innerRow < rows; ++innerRow) {
+          //println "check [" + innerCol + "," + innerRow + "] : " + matrix[innerCol][innerRow];
+          if (matrix[innerCol][innerRow] == GALAXY) {
+            def pathLengthRow = innerRow - row
+            def pathLengthCol = innerCol - col
+            if (pathLengthRow < 0) {
+              pathLengthRow = -1 * pathLengthRow
+            }
+            if (pathLengthCol < 0) {
+              pathLengthCol = -1 * pathLengthCol
+            } 
+            def pathLength = pathLengthRow + pathLengthCol
+            //println "Path Length from [" + col + "," + row + "] to [" + innerCol + "," + innerRow + "] is: " + pathLength
+            pathLengthTotal += pathLength
+          }
+        }
+        innerRowStart = 0
+      }
+    }
+  }
+}
+println "Path Length Total: " + pathLengthTotal
