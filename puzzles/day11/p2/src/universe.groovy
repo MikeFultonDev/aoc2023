@@ -8,8 +8,7 @@ class C {
   static final BLANK='.'
   static final GALAXY='#'
   static final EXPAND='*'
-  static final EXPAND_ADJUSTMENT = 99
-//static final C.EXPAND_ADJUSTMENT = 999999
+  static final EXPAND_ADJUSTMENT = 999999L
 }
 
 def cols=0
@@ -153,7 +152,7 @@ def computeLengthColRow(matrix, col, row, cols, rows, pathLengths) {
   def innerCol
   def innerRow
   def innerRowStart = innerRowFirst
-  println "cols from " + innerColStart + " to " + cols + " and rows " + innerRowStart + " to " + rows
+  //println "cols from " + innerColStart + " to " + cols + " and rows " + innerRowStart + " to " + rows
   for (innerCol = innerColStart; innerCol < cols; ++innerCol) {
     for (innerRow = innerRowStart; innerRow < rows; ++innerRow) {
       //println "check [" + innerCol + "," + innerRow + "] : " + matrix[innerCol][innerRow];
@@ -169,7 +168,7 @@ def computeLengthColRow(matrix, col, row, cols, rows, pathLengths) {
           pathLength += pathBExpand
         }
         pathLengths.put(path, pathLength)
-        println path + " is: " + pathLength
+        //println path + " is: " + pathLength
       }
     }
     innerRowStart = 0
