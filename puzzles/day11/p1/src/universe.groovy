@@ -5,6 +5,7 @@ if (args.length < 1) {
 String file = args[0]
 
 def BLANK='.'
+def HASH='#'
 def cols=0
 def rows=0
 def col=0
@@ -38,6 +39,18 @@ def copycol(inMatrix, outMatrix, inCol, outCol, rows) {
   }
 }
 
+def determinePairs(matrix, rows, cols, symbol) {
+  def count = 0;
+  for (row=0; row<rows; ++row) {
+    for (col=0; col<cols; ++col) {
+      if (matrix[row][col] == symbol) {
+        ++count;
+      }
+    }
+  }
+  return count * (count-1) / 2;
+}
+      
 new File(file).eachLine { line ->
   lines.add(line)
 }
@@ -101,3 +114,11 @@ for (col = 0; col < cols; ++col) {
 def expandedCols = expandedCol
 
 printMatrix(expandedColMatrix, expandedRows, expandedCols)
+
+matrix = expandedColMatrix
+rows = expandedRows
+cols = expandedCols
+
+numPairs = determinePairs(matrix, rows, cols, HASH)
+
+println "Process " + numPairs + " pairs"
