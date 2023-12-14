@@ -5,13 +5,18 @@ Trace 'O'
 rc = ReadFile(fn)
 
 i=1
+Say line.0 'lines'
+totMatches = 0
 Do While i <= line.0
-  Say line.i
   Parse Var line.i string numbers
+  Say line.i
   matches = CountChoices(string, numbers, 1, '')
+  Say 'Matches:' matches
+  totMatches = totMatches + matches
   i = i+1
 End
-Say matches
+
+Say 'Total Matches:' totMatches
 Exit 0
 
 Matches: Procedure
@@ -48,18 +53,24 @@ Parse Arg string, numbers, numMatches, builtString
   numMatchesA = Matches(string, 1, nextNumber)
   If (numMatchesA > 0) Then Do
     nextString = STRIP(SUBSTR(string, nextNumber+1))
-    firstChar = LEFT(nextString, 1)
-    If (firstChar = '.' | firstChar = '?') Then Do
+    firstNextChar = LEFT(nextString, 1)
+    If (firstNextChar = '.' | firstNextChar = '?') Then Do
       nextString = SUBSTR(nextString, 2)
       broken = COPIES('#', nextNumber)
       builtStringA = builtString broken "."
       numMatchesA = CountChoices(nextString, nextNumbers, 1, builtStringA)
     End
     Else Do
-      numMatchesA = 0
+      If (firstNextChar = '' & nextNumbers = '') Then Do
+        Say "--> " builtString
+        Return numMatches
+      End
+      Else Do
+        numMatchesA = 0
+      End
     End
   End
-  If (firstChar = '?') Then Do
+  If (firstChar = '.' | firstChar = '?') Then Do
     builtStringB = builtString "."
     numMatchesB = CountChoices(SUBSTR(string, 2), numbers, 1, builtStringB)
   End
@@ -84,18 +95,20 @@ ReadFile: Procedure Expose line.
 
   fd = retval
 
+  'read' fd 'bytes 100000'
+  If retval = -1 Then
+  Do
+    Say 'Unable to read file: ' fn 'Error: ' errno errnojr
+    Return 8
+  End
+  cr=x2c(15)
   count = 0
   line.0 = count
-  Do Until bytes <= 0
-    'read' fd 'bytes 80'
-    If retval = -1 Then
-    Do
-      Say 'Unable to read file: ' fn 'Error: ' errno errnojr
-      Return 8
-    End
+  Do Until LENGTH(bytes) = 0
     count=count+1
-    nocr = SUBSTR(bytes, 1, length(bytes)-1)
-    line.count = STRIP(nocr)
+    Parse Var bytes rec (cr) remainder
+    line.count = rec
+    bytes = remainder
   End
   line.0 = count
 
