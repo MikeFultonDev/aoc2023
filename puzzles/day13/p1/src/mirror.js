@@ -84,21 +84,28 @@ function verticalReflection(lines) {
   vr = 0;
   const lineLength = lines[0].length
   console.log('Vertical Columns:', lineLength);
-  for (i=1; i<lineLength-2; ++i) {
-    reflect = i;
-    if (lineLength-i-2 < reflect) {
-      reflect = lineLength-i-2;
+  for (pivot=1; pivot<lineLength; ++pivot) {
+    var leftLength = pivot-0;
+    var rightLength = lineLength-pivot;
+    var maxLength = (leftLength > rightLength) ? leftLength : rightLength;
+    var sl = pivot - maxLength;
+    var el = pivot - 1;
+    var sr = pivot;
+    var er = pivot + maxLength - 1;
+    if (sl < 0) {
+      er = er + sl;
+      sl = 0;
     }
-    var sl = i-reflect;
-    var el = i;
-    var sr = i+1;
-    var er = i+reflect+1;
+    if (er > lineLength - 1) {
+      sl = sl + (er - lineLength + 1);
+      er = lineLength - 1;
+    }
     left = buildArrayVertical(lines, sl, el);
     right = buildArrayVertical(lines, sr, er);
     right = flipArrayVertical(right);
 
     if (equalArrays(left, right)) {
-      vr = (i+1);
+      vr = (pivot+1);
       refText = 'Y';
     } else {
       refText = 'N';

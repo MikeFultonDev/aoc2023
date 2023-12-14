@@ -6,3 +6,12 @@
 ..lines...
 ..moreline
 ..moahline
+
+##whatever##
+##isherexa##
+.#ishereyy..
+##andhere.##
+..lines.....
+..lines...##
+..moreline..
+..moahline..
