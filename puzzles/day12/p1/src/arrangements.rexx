@@ -16,7 +16,6 @@ Exit 0
 
 Matches: Procedure
 Parse Arg string, index, number
-
   If (number = '') Then Do
     Return 0
   End
@@ -49,9 +48,16 @@ Parse Arg string, numbers, numMatches, builtString
   numMatchesA = Matches(string, 1, nextNumber)
   If (numMatchesA > 0) Then Do
     nextString = STRIP(SUBSTR(string, nextNumber+1))
-    broken = COPIES('#', nextNumber)
-    builtStringA = builtString " " broken
-    numMatchesA = CountChoices(nextString, nextNumbers, 1, builtStringA)
+    firstChar = LEFT(nextString, 1)
+    If (firstChar = '.' | firstChar = '?') Then Do
+      nextString = SUBSTR(nextString, 2)
+      broken = COPIES('#', nextNumber)
+      builtStringA = builtString broken "."
+      numMatchesA = CountChoices(nextString, nextNumbers, 1, builtStringA)
+    End
+    Else Do
+      numMatchesA = 0
+    End
   End
   If (firstChar = '?') Then Do
     builtStringB = builtString "."
