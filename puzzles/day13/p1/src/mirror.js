@@ -105,7 +105,7 @@ function verticalReflection(lines) {
     right = flipArrayVertical(right);
 
     if (equalArrays(left, right)) {
-      vr = (pivot+1);
+      vr = pivot;
       refText = 'Y';
     } else {
       refText = 'N';
@@ -121,28 +121,36 @@ function verticalReflection(lines) {
 function horizontalReflection(lines) {
   hr = 0;
   console.log('Horizontal Rows:', lines.length);
-  for (i=1; i<lines.length-2; ++i) {
-    reflect = i;
-    if (lines.length-i-2 < reflect) {
-      reflect = lines.length-i-2;
+  rowsLength = lines.length;
+  for (pivot=1; pivot<rowsLength; ++pivot) {
+    var leftLength = pivot-0;
+    var rightLength = rowsLength-pivot;
+    var maxLength = (leftLength > rightLength) ? leftLength : rightLength;
+    var sl = pivot - maxLength;
+    var el = pivot - 1;
+    var sr = pivot;
+    var er = pivot + maxLength - 1;
+    if (sl < 0) {
+      er = er + sl;
+      sl = 0;
     }
-    var su = i-reflect;
-    var eu = i;
-    var sb = i+1;
-    var eb = i+reflect+1;
-    tp = buildArrayHorizontal(lines, su, eu);
-    bottom = buildArrayHorizontal(lines, sb, eb);
+    if (er > rowsLength - 1) {
+      sl = sl + (er - rowsLength + 1);
+      er = rowsLength - 1;
+    }  
+    tp = buildArrayHorizontal(lines, sl, el);
+    bottom = buildArrayHorizontal(lines, sr, er);
     bottom = flipArrayHorizontal(bottom);
 
     if (equalArrays(tp, bottom)) {
-      hr = (i+1);
+      hr = pivot;
       refText = 'Y';
     } else {
       refText = 'N';
     }
 
-    topText = su + '^' + eu;
-    bottomText = sb + 'v' + eb;
+    topText = sl + '^' + el;
+    bottomText = sr + 'v' + er;
       
     console.log(topText, ' and ', bottomText, ':', refText);
   }
