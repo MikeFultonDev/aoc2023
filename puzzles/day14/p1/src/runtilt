@@ -24,7 +24,7 @@ iconv -f ISO8859-1 -t IBM-1047 <$1 >/tmp/$$.txt
 
 myhlq=$(hlq)
 drm -f "${myhlq}.TILT.TXT" 
-dtouch -rfb -l80 "${myhlq}.TILT.TXT"
+dtouch -rvb -l84 "${myhlq}.TILT.TXT"
 dcp /tmp/$$.txt "${myhlq}.TILT.TXT(${mem})"
 
 #

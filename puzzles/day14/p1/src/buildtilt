@@ -7,7 +7,7 @@ drm -f "${myhlq}.user.load"
 dtouch -ru "${myhlq}.user.load"
 
 export STEPLIB=PLI.V6R1M0.SIBMZCMP
-pli -otilt tilt.pli
+pli -otilt -qgonumber tilt.pli
 
 dcp "${mydir}/tilt" "${myhlq}.user.load(tilt)"
 rm -f "${mydir}/tilt"
