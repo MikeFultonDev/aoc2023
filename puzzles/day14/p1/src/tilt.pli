@@ -3,8 +3,8 @@
    */
 
   TILT:   Proc Options(MAIN);
-          Dcl Input Record ENV(V RecSize(80));
-          Dcl REC Char(80) Varying;
+          Dcl Input Record ENV(V RecSize(100));
+          Dcl REC Char(100) Varying;
           Dcl EOF Bit(1) Init('0'B);
           Dcl RecNum Bin(31);
           Dcl Rows Fixed Bin(31);
