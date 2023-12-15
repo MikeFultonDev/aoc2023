@@ -1,0 +1,34 @@
+#!/bin/sh
+set -e
+#
+# Need to run 'tilt' program in MVS 
+#
+
+#
+# First, copy the file in, and don't forget to iconv it to EBCDIC
+#
+
+if [ $# -ne 1 ]; then
+  echo "Syntax: $0 <input>\n" >&2
+  exit 4
+fi
+
+if ! [ -e $1 ]; then
+  echo "Unable to find text file: $1" >&2
+  exit 8
+fi
+base=$(basename $1)
+mem=${base%%.*}
+
+iconv -f ISO8859-1 -t IBM-1047 <$1 >/tmp/$$.txt
+
+myhlq=$(hlq)
+drm -f "${myhlq}.TILT.TXT" 
+dtouch -rfb -l80 "${myhlq}.TILT.TXT"
+dcp /tmp/$$.txt "${myhlq}.TILT.TXT(${mem})"
+
+#
+# Run the program with mvscmd. The DDname INPUT says where to read data from
+#
+
+mvscmd --pgm=tilt --steplib="${myhlq}.USER.LOAD" --input="${myhlq}.TILT.TXT(${mem})" --sysprint=*

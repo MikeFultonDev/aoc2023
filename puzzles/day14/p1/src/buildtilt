@@ -1,0 +1,13 @@
+#!/bin/sh
+set -e
+myhlq=$(hlq)
+mydir="$(cd "$(dirname "$0")" > /dev/null 2>&1 && pwd -P)"
+
+drm -f "${myhlq}.user.load"
+dtouch -ru "${myhlq}.user.load"
+
+export STEPLIB=PLI.V6R1M0.SIBMZCMP
+pli -otilt tilt.pli
+
+dcp "${mydir}/tilt" "${myhlq}.user.load(tilt)"
+rm -f "${mydir}/tilt"
