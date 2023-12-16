@@ -1,3 +1,5 @@
+"use strict";
+
 const path = require('node:path'); 
 const os = require('os');
 const fs = require('node:fs');
@@ -14,9 +16,9 @@ function readFile(file) {
 
 function buildArray(lines) {
   var arr = [];
-  for (row=0; row<lines.length; ++row) {
+  for (var row=0; row<lines.length; ++row) {
     arr[row] = [];
-    for (col=0; col<lines[row].length; ++col) {
+    for (var col=0; col<lines[row].length; ++col) {
       arr[row][col] = lines[row].substring(col,col+1);
     }
   }
@@ -25,9 +27,9 @@ function buildArray(lines) {
 
 function buildArrayVertical(lines, start, end) {
   var arr = [];
-  for (row=0; row<lines.length; ++row) {
+  for (var row=0; row<lines.length; ++row) {
     arr[row] = [];
-    for (col=start; col<=end; ++col) {
+    for (var col=start; col<=end; ++col) {
       arr[row][col-start] = lines[row].substring(col,col+1);
     }
   }
@@ -35,9 +37,9 @@ function buildArrayVertical(lines, start, end) {
 }
 
 function flipArrayVertical(arr) {
-  for (row=0; row<arr.length; ++row) {
+  for (var row=0; row<arr.length; ++row) {
     var ecol = (arr[row].length)-1;
-    for (col=0; col<arr[row].length/2; ++col) {
+    for (var col=0; col<arr[row].length/2; ++col) {
       var tmp = arr[row][col];
       arr[row][col] = arr[row][ecol-col];
       arr[row][ecol-col] = tmp;
@@ -48,9 +50,9 @@ function flipArrayVertical(arr) {
 
 function buildArrayHorizontal(lines, start, end) {
   var arr = [];
-  for (row=start; row<=end; ++row) {
+  for (var row=start; row<=end; ++row) {
     arr[row-start] = [];
-    for (col=0; col <= lines[row].length; ++col) {
+    for (var col=0; col <= lines[row].length; ++col) {
       arr[row-start][col] = lines[row].substring(col,col+1);
     }
   }
@@ -58,9 +60,9 @@ function buildArrayHorizontal(lines, start, end) {
 }
 
 function flipArrayHorizontal(arr) {
-  for (row=0; row<arr.length/2; ++row) {
+  for (var row=0; row<arr.length/2; ++row) {
     var erow = (arr.length)-1;
-    for (col=0; col<arr[row].length; ++col) {
+    for (var col=0; col<arr[row].length; ++col) {
       var tmp = arr[row][col];
       arr[row][col] = arr[erow-row][col];
       arr[erow-row][col] = tmp;
@@ -70,8 +72,8 @@ function flipArrayHorizontal(arr) {
 }
 
 function equalArrays(left, right) {
-  for (row=0; row<left.length; ++row) {
-    for (col=0; col<left[row].length; ++col) {
+  for (var row=0; row<left.length; ++row) {
+    for (var col=0; col<left[row].length; ++col) {
       if (left[row][col] !== right[row][col]) {
         return false;
       }
@@ -81,10 +83,10 @@ function equalArrays(left, right) {
 }
 
 function printArray(arr) {
-  for (row=0; row<arr.length; ++row) {
-    line = '';
-    for (col=0; col<arr[row].length; ++col) {
-      c = arr[row][col];
+  for (var row=0; row<arr.length; ++row) {
+    var line = '';
+    for (var col=0; col<arr[row].length; ++col) {
+      var c = arr[row][col];
       line = line + c;
     }
     console.log(line);
@@ -92,10 +94,10 @@ function printArray(arr) {
 }  
 
 function verticalReflection(lines) {
-  vr = 0;
+  var vr = 0;
   const lineLength = lines[0].length
-  console.log('Vertical Columns:', lineLength);
-  for (pivot=1; pivot<lineLength; ++pivot) {
+  //console.log('Vertical Columns:', lineLength);
+  for (var pivot=1; pivot<lineLength; ++pivot) {
     var leftLength = pivot-0;
     var rightLength = lineLength-pivot;
     var maxLength = (leftLength > rightLength) ? leftLength : rightLength;
@@ -111,29 +113,30 @@ function verticalReflection(lines) {
       sl = sl + (er - lineLength + 1);
       er = lineLength - 1;
     }
-    left = buildArrayVertical(lines, sl, el);
-    right = buildArrayVertical(lines, sr, er);
+    var left = buildArrayVertical(lines, sl, el);
+    var right = buildArrayVertical(lines, sr, er);
     right = flipArrayVertical(right);
 
+    var refText;
     if (equalArrays(left, right)) {
       vr = pivot;
       refText = 'Y';
     } else {
       refText = 'N';
     }
-    leftText = sl + '->' + el;
-    rightText = sr + '->' + er;
+    var leftText = sl + '->' + el;
+    var rightText = sr + '->' + er;
       
-    console.log(leftText, ' and ', rightText, ':', refText);
+    //console.log(leftText, ' and ', rightText, ':', refText);
   }
   return vr;
 }
 
 function horizontalReflection(lines) {
-  hr = 0;
-  console.log('Horizontal Rows:', lines.length);
-  rowsLength = lines.length;
-  for (pivot=1; pivot<rowsLength; ++pivot) {
+  var hr = 0;
+  //console.log('Horizontal Rows:', lines.length);
+  var rowsLength = lines.length;
+  for (var pivot=1; pivot<rowsLength; ++pivot) {
     var leftLength = pivot-0;
     var rightLength = rowsLength-pivot;
     var maxLength = (leftLength > rightLength) ? leftLength : rightLength;
@@ -149,10 +152,11 @@ function horizontalReflection(lines) {
       sl = sl + (er - rowsLength + 1);
       er = rowsLength - 1;
     }  
-    tp = buildArrayHorizontal(lines, sl, el);
-    bottom = buildArrayHorizontal(lines, sr, er);
+    var tp = buildArrayHorizontal(lines, sl, el);
+    var bottom = buildArrayHorizontal(lines, sr, er);
     bottom = flipArrayHorizontal(bottom);
 
+    var refText;
     if (equalArrays(tp, bottom)) {
       hr = pivot;
       refText = 'Y';
@@ -160,77 +164,81 @@ function horizontalReflection(lines) {
       refText = 'N';
     }
 
-    topText = sl + '^' + el;
-    bottomText = sr + 'v' + er;
+    var topText = sl + '^' + el;
+    var bottomText = sr + 'v' + er;
       
-    console.log(topText, ' and ', bottomText, ':', refText);
+    //console.log(topText, ' and ', bottomText, ':', refText);
   }
   return hr;
 }
 
-function getPossibleSmudgePoints(lines) {
-  arr = buildArray(lines);
+function getPossibleSmudgePoints(lines, direction) {
+  var arr = buildArray(lines);
 
-  smudges = []; 
-  smudgeNum = 0;
-  vertNum = [];
-  for (row=0; row<arr.length; ++row) {
-    vertNum[row] = 0;
-    for (col=0; col<arr[0].length; ++col) {
-      if (arr[row][col] == '#') {
-        vertNum[row] |= (1 << col);
-        //console.log('vertNum[' + row + '] ' + vertNum[row]);
-      }
-    }
-  }
-  for (outer=0; outer<arr.length; ++outer) {
-    for (inner=outer+1; inner<arr.length; ++inner) {
-      diffBits = (vertNum[outer] ^ vertNum[inner]);
-      close = (diffBits & (diffBits - 1));
-      //console.log(inner + ' and ' + outer + ' rows Diffbits: ' + diffBits + ' close: ' + close);
-      if ((diffBits !== 0) && (close === 0)) {
-        colVal = diffBits;
-        colNum = -1;
-        while (colVal > 0) {
-          colVal >>= 1;
-          colNum++;
-        }
-
-        //console.log(inner + ' and ' + outer + ' rows could be smudged. Only column: ' + colNum + ' differs.');
-        
-        smudges[smudgeNum++] = [ colNum, inner ];
-        smudges[smudgeNum++] = [ colNum, outer ];
-      }
-    }
-  }
-
-  horNum = [];
-  for (col=0; col<arr[0].length; ++col) {
-    horNum[col] = 0;
+  var smudges = []; 
+  var smudgeNum = 0;
+  if (direction === 'V') {
+    var vertNum = [];
     for (row=0; row<arr.length; ++row) {
-      if (arr[row][col] == '#') {
-        horNum[col] |= (1 << row);
-        //console.log('horNum[' + col + '] ' + vertNum[col]);
+      vertNum[row] = 0;
+      for (col=0; col<arr[0].length; ++col) {
+        if (arr[row][col] == '#') {
+          vertNum[row] |= (1 << col);
+          //console.log('vertNum[' + row + '] ' + vertNum[row]);
+        }
+      }
+    }
+    for (var outer=0; outer<arr.length; ++outer) {
+      for (var inner=outer+1; inner<arr.length; ++inner) {
+        var diffBits = (vertNum[outer] ^ vertNum[inner]);
+        var close = (diffBits & (diffBits - 1));
+        //console.log(inner + ' and ' + outer + ' rows Diffbits: ' + diffBits + ' close: ' + close);
+        if ((diffBits !== 0) && (close === 0)) {
+          var colVal = diffBits;
+          var colNum = -1;
+          while (colVal > 0) {
+            colVal >>= 1;
+            colNum++;
+          }
+
+          console.log(outer + ' and ' + inner + ' rows could be smudged. Only column: ' + colNum + ' differs.');
+          
+          smudges[smudgeNum++] = [ colNum, outer ];
+          smudges[smudgeNum++] = [ colNum, inner ];
+        }
       }
     }
   }
-  for (outer=0; outer<arr.length; ++outer) {
-    for (inner=outer+1; inner<arr.length; ++inner) {
-      diffBits = (horNum[outer] ^ horNum[inner]);
-      close = (diffBits & (diffBits - 1));
-      //console.log(inner + ' and ' + outer + ' rows Diffbits: ' + diffBits + ' close: ' + close);
-      if ((diffBits !== 0) && (close === 0)) {
-        rowVal = diffBits;
-        rowNum = -1;
-        while (rowVal > 0) {
-          rowVal >>= 1;
-          rowNum++;
-        }
 
-        //console.log(inner + ' and ' + outer + ' columns could be smudged. Only row: ' + rowNum + ' differs.');
-        
-        smudges[smudgeNum++] = [ inner, rowNum ];
-        smudges[smudgeNum++] = [ outer, rowNum ];
+  if (direction === 'H') {
+    var horNum = [];
+    for (var col=0; col<arr[0].length; ++col) {
+      horNum[col] = 0;
+      for (var row=0; row<arr.length; ++row) {
+        if (arr[row][col] == '#') {
+          horNum[col] |= (1 << row);
+          //console.log('horNum[' + col + '] ' + vertNum[col]);
+        }
+      }
+    }
+    for (var outer=0; outer<arr.length; ++outer) {
+      for (var inner=outer+1; inner<arr.length; ++inner) {
+        var diffBits = (horNum[outer] ^ horNum[inner]);
+        var close = (diffBits & (diffBits - 1));
+        //console.log(inner + ' and ' + outer + ' rows Diffbits: ' + diffBits + ' close: ' + close);
+        if ((diffBits !== 0) && (close === 0)) {
+          var rowVal = diffBits;
+          var rowNum = -1;
+          while (rowVal > 0) {
+            rowVal >>= 1;
+            rowNum++;
+          }
+
+          console.log(outer + ' and ' + inner + ' columns could be smudged. Only row: ' + rowNum + ' differs.');
+          
+          smudges[smudgeNum++] = [ outer, rowNum ];
+          smudges[smudgeNum++] = [ inner, rowNum ];
+        }
       }
     }
   }
@@ -245,40 +253,67 @@ function rotateArray(lines) {
   // i.e. if line length is 20 and reflection line is at 3, then 0,1,2 and 3,4,5 need to reflect
   // but if reflection is at 12, then 4,5,6,7,8,9,10,11 and 12,13,14,15,16,17,18,19 need to reflect
 
+  var i;
   for (i=0; i<lines.length; ++i) {
     console.log(lines[i]);
   }
 
+  // Determine mirror direction
+  var vert = lines.slice();
+  var hor = lines.slice();
+
+  var ovr = verticalReflection(vert);
+  var ohr = horizontalReflection(hor);
+
+  var direction;
+  if (vr != 0) {
+    direction = 'V';
+  } else {
+    direction = 'H';
+  }
+  console.log('Original mirror is: ' + direction);
+
   //
   // Try each smudge and see if it works
   //
-  list = getPossibleSmudgePoints(lines);
+  var list = getPossibleSmudgePoints(lines, direction);
 
-  for (var i=0; i<list.length; ++i) {
-    var smudgeCol = list[i][0];
-    var smudgeRow = list[i][1];
+  var smudgeCol;
+  var smudgeRow;
+  var testMatrix = [];
+  var vr = 0;
+  var hr = 0;
+
+  for (var sl=0; sl<list.length; ++sl) {
+    smudgeCol = list[sl][0];
+    smudgeRow = list[sl][1];
 
     console.log("Smudge: [ " + smudgeCol + "," + smudgeRow + "]");
   
-    var testMatrix = lines.slice();
-    
-    var temp = testMatrix[smudgeCol][smudgeRow];
-    if (testMatrix[smudgeCol][smudgeRow] == '#') {
-      testMatrix[smudgeCol][smudgeRow] = '.';
+    testMatrix = lines.slice();
+   
+    var line = testMatrix[smudgeCol];
+    if (testMatrix[smudgeCol][smudgeRow] === "#") {
+      // This is a string, so I have to rebuild it
+      testMatrix[smudgeCol] = line.substring(0,smudgeCol) + "." + line.substring(smudgeCol+1);
     } else {
-      testMatrix[smudgeCol][smudgeRow] = '#';
+      testMatrix[smudgeCol] = line.substring(0,smudgeCol) + "#" + line.substring(smudgeCol+1);
     }
-    vert = testMatrix.slice();
-    hor = testMatrix.slice();
+    printArray(testMatrix);
 
-    vr = verticalReflection(vert);
-    hr = horizontalReflection(hor);
+    if (direction === 'V') {
+      vert = testMatrix.slice();
+      vr = verticalReflection(vert);
+    } else {
+      hor = testMatrix.slice();
+      hr = horizontalReflection(hor);
+    }
 
     if (hr != 0 || vr != 0) {
-      console.log("able to mirror");
+      console.log("able to mirror. hr: " + hr + "vr: " + vr);
       break;
     }
-  }
+  } 
 
   return vr + hr*100;
 }
@@ -316,10 +351,10 @@ while (li < lines.length) {
   }
   end = li;
   if (start < lines.length) {
-    total = rotateArray(lines.slice(start, end));
+    var total = rotateArray(lines.slice(start, end));
     grandTotal += total;
-    rows=lines[start].length;
-    cols=end-start+1;
+    var rows=lines[start].length;
+    var cols=end-start+1;
     if (maxRow < rows) {
       maxRow = rows;
     }

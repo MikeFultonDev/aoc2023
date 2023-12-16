@@ -20,7 +20,7 @@ Do While i <= line.0
   End
 
   Say string numbers
-  string = SimplifyString(string)
+  string = SimplifyString(string, numbers)
   Say string numbers
   matches = CountChoices(string, numbers, 1, '')
   Say 'Matches:' matches
@@ -32,9 +32,47 @@ Say 'Total Matches:' totMatches
 Exit 0
 
 SimplifyString: Procedure
-Parse Arg string
+Parse Arg string, numbers
 
-Return string
+max = 0
+Parse Var numbers nextNum','numbers
+Do while nextNum <> ''
+  If (nextNum > max) Then Do
+    max = NextNum
+  End
+  Parse Var numbers nextNum','numbers
+End
+
+maxDamaged = COPIES('#', max)
+
+Trace 'R'
+Parse Var string left (maxDamaged) remainder
+simplifiedString = ''
+Do while remainder <> ''
+  If (left <> '') Then Do
+    left = SUBSTR(left, 1, LENGTH(left)-1)||'.'
+  End
+  If (remainder <> '') Then Do
+    right = '.'
+    remainder = SUBSTR(remainder, 2)
+  End
+  simplifiedString = simplifiedString||left||maxDamaged||right
+  Parse Var remainder left (maxDamaged) nextRemainder
+  If (nextRemainder = '') Then Do
+    simplifiedString = simplifiedString||remainder
+    remainder = ''
+  End
+  Else Do
+    remainder = nextRemainder
+  End
+End
+Trace 'O'
+If (simplifiedString <> '') Then Do
+  Return simplifiedString
+End
+Else Do
+  Return string
+End
 
 
 Matches: Procedure

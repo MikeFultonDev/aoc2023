@@ -42,7 +42,7 @@ Parse Arg string, numbers, numMatches, builtString
   firstChar = LEFT(string, 1)
   If (firstChar = '') Then Do
     If (nextNumber = '') Then Do
-      Say "--> " builtString
+      /* Say "--> " builtString */
       Return numMatches
     End
     Else Do
