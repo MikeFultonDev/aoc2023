@@ -52,7 +52,7 @@ function buildArrayHorizontal(lines, start, end) {
   var arr = [];
   for (var row=start; row<=end; ++row) {
     arr[row-start] = [];
-    for (var col=0; col <= lines[row].length; ++col) {
+    for (var col=0; col < lines[row].length; ++col) {
       arr[row-start][col] = lines[row].substring(col,col+1);
     }
   }
@@ -119,6 +119,7 @@ function verticalReflection(lines) {
 
     var refText;
     if (equalArrays(left, right)) {
+      console.log('Equal arrays at pivot: ' + pivot);
       vr = pivot;
       refText = 'Y';
     } else {
@@ -127,8 +128,9 @@ function verticalReflection(lines) {
     var leftText = sl + '->' + el;
     var rightText = sr + '->' + er;
       
-    //console.log(leftText, ' and ', rightText, ':', refText);
+    console.log(leftText, ' and ', rightText, ':', refText);
   }
+ console.log('Return vr: ' + vr);
   return vr;
 }
 
@@ -177,7 +179,7 @@ function getPossibleSmudgePoints(lines, direction) {
 
   var smudges = []; 
   var smudgeNum = 0;
-  if (direction === 'V') {
+  if (direction !== 'H') {
     var vertNum = [];
     for (row=0; row<arr.length; ++row) {
       vertNum[row] = 0;
@@ -188,7 +190,7 @@ function getPossibleSmudgePoints(lines, direction) {
         }
       }
     }
-    for (var outer=0; outer<arr.length; ++outer) {
+    for (var outer=0; outer<arr.length-1; ++outer) {
       for (var inner=outer+1; inner<arr.length; ++inner) {
         var diffBits = (vertNum[outer] ^ vertNum[inner]);
         var close = (diffBits & (diffBits - 1));
@@ -210,7 +212,7 @@ function getPossibleSmudgePoints(lines, direction) {
     }
   }
 
-  if (direction === 'H') {
+  if (direction !== 'V') {
     var horNum = [];
     for (var col=0; col<arr[0].length; ++col) {
       horNum[col] = 0;
@@ -221,7 +223,7 @@ function getPossibleSmudgePoints(lines, direction) {
         }
       }
     }
-    for (var outer=0; outer<arr.length; ++outer) {
+    for (var outer=0; outer<arr.length-1; ++outer) {
       for (var inner=outer+1; inner<arr.length; ++inner) {
         var diffBits = (horNum[outer] ^ horNum[inner]);
         var close = (diffBits & (diffBits - 1));
@@ -266,12 +268,14 @@ function rotateArray(lines) {
   var ohr = horizontalReflection(hor);
 
   var direction;
-  if (vr != 0) {
+  if (ovr != 0) {
     direction = 'V';
   } else {
     direction = 'H';
   }
-  console.log('Original mirror is: ' + direction);
+  direction = 'A';
+
+  console.log('Original mirror is: ' + direction + " with vr: " + ovr + " and hr: " + ohr);
 
   //
   // Try each smudge and see if it works
@@ -288,11 +292,12 @@ function rotateArray(lines) {
     smudgeCol = list[sl][0];
     smudgeRow = list[sl][1];
 
-    console.log("Smudge: [ " + smudgeCol + "," + smudgeRow + "]");
-  
     testMatrix = lines.slice();
+    printArray(testMatrix);
+    console.log("Smudge: [ " + smudgeCol + "," + smudgeRow + "]");
    
     var line = testMatrix[smudgeCol];
+
     if (testMatrix[smudgeCol][smudgeRow] === "#") {
       // This is a string, so I have to rebuild it
       testMatrix[smudgeCol] = line.substring(0,smudgeCol) + "." + line.substring(smudgeCol+1);
@@ -310,7 +315,7 @@ function rotateArray(lines) {
     }
 
     if (hr != 0 || vr != 0) {
-      console.log("able to mirror. hr: " + hr + "vr: " + vr);
+      console.log("able to mirror. hr: " + hr + " vr: " + vr);
       break;
     }
   } 
