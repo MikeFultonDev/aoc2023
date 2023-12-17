@@ -1,3 +1,4 @@
 *.cbl zos-working-tree-encoding=IBM-1047
 *.groovy zos-working-tree-encoding=IBM-1047
+*.kt zos-working-tree-encoding=IBM-1047
 universe*.txt zos-working-tree-encoding=IBM-1047
