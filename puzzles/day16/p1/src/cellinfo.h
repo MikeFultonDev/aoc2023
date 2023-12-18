@@ -17,7 +17,8 @@
     Up=0x1,
     Down=0x2,
     Left=0x4,
-    Right=0x8
+    Right=0x8,
+    Blocked=0x10
   };
 
   struct BeamCell {

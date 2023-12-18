@@ -142,8 +142,190 @@ struct BeamCell* beam_cell(struct BeamMatrix* matrix, int col, int row)
   return &matrix->cells[raw_index];
 }
 
+static enum ActiveDirection compute_new_direction(struct BeamMatrix* matrix, enum ActiveDirection direction, size_t col, size_t row)
+{
+  switch (direction) {
+    case Up:
+      return (row > 0) ? Up : Blocked;
+    case Down:
+      return (row < matrix->rows) ? Down : Blocked;
+    case Left:
+      return (col > 0) ? Left : Blocked;
+    case Right:
+      return (col < matrix->cols) ? Right : Blocked;
+    default:
+      fprintf(stderr, "Unexpected direction for compute_new_direction %hhu\n", direction);
+      return Blocked;
+  }
+}
+
+static int compute_new_location(struct BeamMatrix* matrix, enum ActiveDirection direction, size_t col, size_t row, struct BeamState* out)
+{
+  switch (direction) {
+    case Up: {
+      out->direction = compute_new_direction(matrix, direction, col, row);
+      out->row = row-1;
+      out->col = col;
+      return 0;
+    }
+    case Down: {
+      out->direction = compute_new_direction(matrix, direction, col, row);
+      out->row = row+1;
+      out->col = col;
+      return 0;
+    }
+    case Left: {
+      out->direction = compute_new_direction(matrix, direction, col, row);
+      out->row = row;
+      out->col = col-1;
+      return 0;
+    }
+    case Right: {
+      out->direction = compute_new_direction(matrix, direction, col, row);
+      out->row = row;
+      out->col = col+1;
+      return 0;
+    }
+    default:
+      fprintf(stderr, "Unexpected direction for compute_new_location %hhu\n", direction);
+      return 4;
+  } 
+}
+
+static int compute_new_horizontal_locations(struct BeamMatrix* matrix, size_t col, size_t row, struct BeamOutState* out)
+{
+  size_t num_directions = 0;
+  enum ActiveDirection direction;
+  direction = compute_new_direction(matrix, Right, col, row);
+  if (direction != Blocked) {
+    out->beam[num_directions].direction = Right;
+    out->beam[num_directions].col = col+1;
+    out->beam[num_directions].row = row;
+  }
+  direction = compute_new_direction(matrix, Left, col, row);
+  if (direction != Blocked) {
+    out->beam[num_directions].direction = Left;
+    out->beam[num_directions].col = col-1;
+    out->beam[num_directions].row = row;
+  }
+  return 0;
+}
+
+static int compute_new_vertical_locations(struct BeamMatrix* matrix, size_t col, size_t row, struct BeamOutState* out)
+{
+  size_t num_directions = 0;
+  enum ActiveDirection direction;
+  direction = compute_new_direction(matrix, Up, col, row);
+  if (direction != Blocked) {
+    out->beam[num_directions].direction = Up;
+    out->beam[num_directions].col = col;
+    out->beam[num_directions].row = row-1;
+  }
+  direction = compute_new_direction(matrix, Down, col, row);
+  if (direction != Blocked) {
+    out->beam[num_directions].direction = Down;
+    out->beam[num_directions].col = col;
+    out->beam[num_directions].row = row+1;
+  }
+  return 0;
+}
+
 static int compute_to_state(struct BeamMatrix* matrix, struct BeamState* in, struct BeamOutState* out) 
 {
+  enum CellDevice device = beam_cell(matrix, in->col, in->row)->device;
+  if (device == NoDevice) {
+    out->num_directions = 1;
+    return compute_new_location(matrix, in->direction, in->col, in->row, &out->beam[0]);
+  }
+
+  switch (in->direction) {
+    case Up: {
+      switch (device) {
+        case Slash: {
+          return compute_new_location(matrix, Right, in->col, in->row, &out->beam[0]);
+        }
+        case BackSlash: {
+          return compute_new_location(matrix, Left, in->col, in->row, &out->beam[0]);
+        }
+        case VerticalSplitter: {
+          return compute_new_location(matrix, in->direction, in->col, in->row, &out->beam[0]);
+        }
+        case HorizontalSplitter: {
+          return compute_new_horizontal_locations(matrix, in->col, in->row, out);
+        }
+        default: {
+          fprintf(stderr, "Unexpected direction as input to compute_state Up\n");
+          return 8;
+        }
+      }
+    }
+    case Down: {
+      switch (device) {
+        case Slash: {
+          return compute_new_location(matrix, Left, in->col, in->row, &out->beam[0]);
+        }
+        case BackSlash: {
+          return compute_new_location(matrix, Right, in->col, in->row, &out->beam[0]);
+        }
+        case VerticalSplitter: {
+          return compute_new_location(matrix, in->direction, in->col, in->row, &out->beam[0]);
+        }
+        case HorizontalSplitter: {
+          return compute_new_horizontal_locations(matrix, in->col, in->row, out);
+        }
+        default: {
+          fprintf(stderr, "Unexpected direction as input to compute_state Down\n");
+          return 12;
+        }
+      }
+    }
+    case Left: {
+      switch (device) {
+        case Slash: {
+          return compute_new_location(matrix, Down, in->col, in->row, &out->beam[0]);
+        }
+        case BackSlash: {
+          return compute_new_location(matrix, Up, in->col, in->row, &out->beam[0]);
+        }
+        case VerticalSplitter: {
+          return compute_new_vertical_locations(matrix, in->col, in->row, out);
+        }
+        case HorizontalSplitter: {
+          return compute_new_location(matrix, in->direction, in->col, in->row, &out->beam[0]);
+        }
+        default: {
+          fprintf(stderr, "Unexpected direction as input to compute_state Left\n");
+          return 12;
+        }
+      }
+    }
+    case Right: {
+      switch (device) {
+        case Slash: {
+          return compute_new_location(matrix, Up, in->col, in->row, &out->beam[0]);
+        }
+        case BackSlash: {
+          return compute_new_location(matrix, Down, in->col, in->row, &out->beam[0]);
+        }
+        case VerticalSplitter: {
+          return compute_new_vertical_locations(matrix, in->col, in->row, out);
+        }
+        case HorizontalSplitter: {
+          return compute_new_location(matrix, in->direction, in->col, in->row, &out->beam[0]);
+        }
+        default: {
+          fprintf(stderr, "Unexpected direction as input to compute_state Right\n");
+          return 12;
+        }
+      }
+    }
+    default: {
+      fprintf(stderr, "Unexpected direction as input to compute_state\n");
+      return 4;
+    }
+  }
+
+ 
   return 0;
 }
 
