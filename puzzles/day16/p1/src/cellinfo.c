@@ -159,31 +159,32 @@ static enum ActiveDirection compute_new_direction(struct BeamMatrix* matrix, enu
   }
 }
 
-static int compute_new_location(struct BeamMatrix* matrix, enum ActiveDirection direction, size_t col, size_t row, struct BeamState* out)
+static int compute_new_location(struct BeamMatrix* matrix, enum ActiveDirection direction, size_t col, size_t row, struct BeamOutState* state, struct BeamState* beam)
 {
+  state->num_directions = 1;
   switch (direction) {
     case Up: {
-      out->direction = compute_new_direction(matrix, direction, col, row);
-      out->row = row-1;
-      out->col = col;
+      beam->direction = compute_new_direction(matrix, direction, col, row);
+      beam->row = row-1;
+      beam->col = col;
       return 0;
     }
     case Down: {
-      out->direction = compute_new_direction(matrix, direction, col, row);
-      out->row = row+1;
-      out->col = col;
+      beam->direction = compute_new_direction(matrix, direction, col, row);
+      beam->row = row+1;
+      beam->col = col;
       return 0;
     }
     case Left: {
-      out->direction = compute_new_direction(matrix, direction, col, row);
-      out->row = row;
-      out->col = col-1;
+      beam->direction = compute_new_direction(matrix, direction, col, row);
+      beam->row = row;
+      beam->col = col-1;
       return 0;
     }
     case Right: {
-      out->direction = compute_new_direction(matrix, direction, col, row);
-      out->row = row;
-      out->col = col+1;
+      beam->direction = compute_new_direction(matrix, direction, col, row);
+      beam->row = row;
+      beam->col = col+1;
       return 0;
     }
     default:
@@ -201,13 +202,16 @@ static int compute_new_horizontal_locations(struct BeamMatrix* matrix, size_t co
     out->beam[num_directions].direction = Right;
     out->beam[num_directions].col = col+1;
     out->beam[num_directions].row = row;
+    ++num_directions;
   }
   direction = compute_new_direction(matrix, Left, col, row);
   if (direction != Blocked) {
     out->beam[num_directions].direction = Left;
     out->beam[num_directions].col = col-1;
     out->beam[num_directions].row = row;
+    ++num_directions;
   }
+  out->num_directions = num_directions;
   return 0;
 }
 
@@ -220,35 +224,43 @@ static int compute_new_vertical_locations(struct BeamMatrix* matrix, size_t col,
     out->beam[num_directions].direction = Up;
     out->beam[num_directions].col = col;
     out->beam[num_directions].row = row-1;
+    ++num_directions;
   }
   direction = compute_new_direction(matrix, Down, col, row);
   if (direction != Blocked) {
     out->beam[num_directions].direction = Down;
     out->beam[num_directions].col = col;
     out->beam[num_directions].row = row+1;
+    ++num_directions;
   }
+  out->num_directions = num_directions;
   return 0;
 }
 
 static int compute_to_state(struct BeamMatrix* matrix, struct BeamState* in, struct BeamOutState* out) 
 {
-  enum CellDevice device = beam_cell(matrix, in->col, in->row)->device;
+  struct BeamCell* cell = beam_cell(matrix, in->col, in->row);
+  if (!cell) {
+    fprintf(stderr, "Unable to find cell at %zu %zu\n", in->col, in->row);
+    return 16;
+  }
+  out->num_directions = 0;
+  enum CellDevice device = cell->device;
   if (device == NoDevice) {
-    out->num_directions = 1;
-    return compute_new_location(matrix, in->direction, in->col, in->row, &out->beam[0]);
+    return compute_new_location(matrix, in->direction, in->col, in->row, out, &out->beam[0]);
   }
 
   switch (in->direction) {
     case Up: {
       switch (device) {
         case Slash: {
-          return compute_new_location(matrix, Right, in->col, in->row, &out->beam[0]);
+          return compute_new_location(matrix, Right, in->col, in->row, out, &out->beam[0]);
         }
         case BackSlash: {
-          return compute_new_location(matrix, Left, in->col, in->row, &out->beam[0]);
+          return compute_new_location(matrix, Left, in->col, in->row, out, &out->beam[0]);
         }
         case VerticalSplitter: {
-          return compute_new_location(matrix, in->direction, in->col, in->row, &out->beam[0]);
+          return compute_new_location(matrix, in->direction, in->col, in->row, out, &out->beam[0]);
         }
         case HorizontalSplitter: {
           return compute_new_horizontal_locations(matrix, in->col, in->row, out);
@@ -262,13 +274,13 @@ static int compute_to_state(struct BeamMatrix* matrix, struct BeamState* in, str
     case Down: {
       switch (device) {
         case Slash: {
-          return compute_new_location(matrix, Left, in->col, in->row, &out->beam[0]);
+          return compute_new_location(matrix, Left, in->col, in->row, out, &out->beam[0]);
         }
         case BackSlash: {
-          return compute_new_location(matrix, Right, in->col, in->row, &out->beam[0]);
+          return compute_new_location(matrix, Right, in->col, in->row, out, &out->beam[0]);
         }
         case VerticalSplitter: {
-          return compute_new_location(matrix, in->direction, in->col, in->row, &out->beam[0]);
+          return compute_new_location(matrix, in->direction, in->col, in->row, out, &out->beam[0]);
         }
         case HorizontalSplitter: {
           return compute_new_horizontal_locations(matrix, in->col, in->row, out);
@@ -282,16 +294,16 @@ static int compute_to_state(struct BeamMatrix* matrix, struct BeamState* in, str
     case Left: {
       switch (device) {
         case Slash: {
-          return compute_new_location(matrix, Down, in->col, in->row, &out->beam[0]);
+          return compute_new_location(matrix, Down, in->col, in->row, out, &out->beam[0]);
         }
         case BackSlash: {
-          return compute_new_location(matrix, Up, in->col, in->row, &out->beam[0]);
+          return compute_new_location(matrix, Up, in->col, in->row, out, &out->beam[0]);
         }
         case VerticalSplitter: {
           return compute_new_vertical_locations(matrix, in->col, in->row, out);
         }
         case HorizontalSplitter: {
-          return compute_new_location(matrix, in->direction, in->col, in->row, &out->beam[0]);
+          return compute_new_location(matrix, in->direction, in->col, in->row, out, &out->beam[0]);
         }
         default: {
           fprintf(stderr, "Unexpected direction as input to compute_state Left\n");
@@ -302,16 +314,16 @@ static int compute_to_state(struct BeamMatrix* matrix, struct BeamState* in, str
     case Right: {
       switch (device) {
         case Slash: {
-          return compute_new_location(matrix, Up, in->col, in->row, &out->beam[0]);
+          return compute_new_location(matrix, Up, in->col, in->row, out, &out->beam[0]);
         }
         case BackSlash: {
-          return compute_new_location(matrix, Down, in->col, in->row, &out->beam[0]);
+          return compute_new_location(matrix, Down, in->col, in->row, out, &out->beam[0]);
         }
         case VerticalSplitter: {
           return compute_new_vertical_locations(matrix, in->col, in->row, out);
         }
         case HorizontalSplitter: {
-          return compute_new_location(matrix, in->direction, in->col, in->row, &out->beam[0]);
+          return compute_new_location(matrix, in->direction, in->col, in->row, out, &out->beam[0]);
         }
         default: {
           fprintf(stderr, "Unexpected direction as input to compute_state Right\n");
@@ -329,6 +341,19 @@ static int compute_to_state(struct BeamMatrix* matrix, struct BeamState* in, str
   return 0;
 }
 
+static void print_state(struct BeamState* beam) 
+{
+  printf("direction: %hhu col:%zu row:%zu \n", beam->direction, beam->col, beam->row);
+}
+
+static void print_out_state(struct BeamOutState* out) 
+{
+  printf("num entries: %zu\n", out->num_directions);
+  for (size_t i=0; i<out->num_directions; ++i) {
+    print_state(&out->beam[i]);
+  }
+}
+
 size_t track_beam(struct BeamMatrix* matrix, struct BeamState* in)
 {
   int rc;
@@ -340,12 +365,13 @@ size_t track_beam(struct BeamMatrix* matrix, struct BeamState* in)
 
   cell->direction |= in->direction; // Add in this new beam direction
 
-  struct BeamOutState out;
+  struct BeamOutState out = {0};
   rc = compute_to_state(matrix, in, &out);
   if (rc) {
     return 0;
   }
 
+  print_out_state(&out);
   for (size_t i=0; i<out.num_directions; ++i) {
     energized_cells += track_beam(matrix, &out.beam[i]);
   }
