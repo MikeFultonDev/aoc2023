@@ -1,11 +1,13 @@
 #include "cellinfo.h"
 #include "io.h"
 #include <stdio.h>
+#include <stddef.h>
 
 int main(int argc, char* argv[]) {
   const char* cfname;
   int rc;
   struct BeamMatrix* matrix;
+  struct BeamState beam_in = { Right, 0, 0 };
 
   if (argc != 2) {
     fprintf(stderr, "Syntax: %s <beam-matrix file>\n", argv[0]);
@@ -19,5 +21,8 @@ int main(int argc, char* argv[]) {
 
   print_matrix(matrix);
 
+  size_t energized_cells = track_beam(matrix, &beam_in);
+
+  printf("%zu energized cells\n", energized_cells);
   return 0;
 }

@@ -26,14 +26,26 @@
   };
 
   struct BeamMatrix {
-    int cols;
-    int rows;
+    size_t cols;
+    size_t rows;
 
     struct BeamCell* cells;
+  };
 
+  struct BeamState {
+    enum ActiveDirection direction;
+    size_t col;
+    size_t row;
+  };
+
+  struct BeamOutState {
+    size_t num_directions;
+    struct BeamState beam[2];
   };
 
   struct BeamMatrix* create_beam_matrix(const char* raw_data, size_t raw_data_len);
   int print_matrix(struct BeamMatrix* matrix);
   struct BeamCell* beam_cell(struct BeamMatrix* matrix, int col, int row);
+
+  size_t track_beam(struct BeamMatrix* matrix, struct BeamState* in);
 #endif

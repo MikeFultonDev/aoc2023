@@ -86,7 +86,7 @@ int print_matrix(struct BeamMatrix* matrix)
     return 4;
   }
 
-  printf("Matrix size: %d cols by %d rows\n", matrix->cols, matrix->rows);
+  printf("Matrix size: %zu cols by %zu rows\n", matrix->cols, matrix->rows);
   for (row=0; row<matrix->rows; ++row) {
     for (col=0; col<matrix->cols; ++col) {
       struct BeamCell* cell = beam_cell(matrix, col, row);
@@ -140,4 +140,32 @@ struct BeamCell* beam_cell(struct BeamMatrix* matrix, int col, int row)
 {
   size_t raw_index = (row * matrix->cols) + col;
   return &matrix->cells[raw_index];
+}
+
+static int compute_to_state(struct BeamMatrix* matrix, struct BeamState* in, struct BeamOutState* out) 
+{
+  return 0;
+}
+
+size_t track_beam(struct BeamMatrix* matrix, struct BeamState* in)
+{
+  int rc;
+  size_t energized_cells = 0;
+  struct BeamCell* cell = beam_cell(matrix, in->col, in->row);   
+  if (cell->direction & in->direction) {
+    return 0; // The beam has already gone through this cell in this direction
+  }
+
+  cell->direction |= in->direction; // Add in this new beam direction
+
+  struct BeamOutState out;
+  rc = compute_to_state(matrix, in, &out);
+  if (rc) {
+    return 0;
+  }
+
+  for (size_t i=0; i<out.num_directions; ++i) {
+    energized_cells += track_beam(matrix, &out.beam[i]);
+  }
+  return energized_cells;
 }
