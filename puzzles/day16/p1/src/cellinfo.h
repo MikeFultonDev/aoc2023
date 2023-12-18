@@ -2,6 +2,7 @@
   #define __CELL_INFO__ 1
 
   #include <stddef.h>
+  #include <stdint.h>
 
   enum CellDevice {
     NoDevice=0,
@@ -21,7 +22,7 @@
 
   struct BeamCell {
     enum CellDevice device;
-    enum ActiveDirection direction;
+    uint32_t direction;
   };
 
   struct BeamMatrix {
@@ -33,5 +34,6 @@
   };
 
   struct BeamMatrix* create_beam_matrix(const char* raw_data, size_t raw_data_len);
-  struct BeamCell* cell(struct BeamMatrix* matrix, int col, int row);
+  int print_matrix(struct BeamMatrix* matrix);
+  struct BeamCell* beam_cell(struct BeamMatrix* matrix, int col, int row);
 #endif

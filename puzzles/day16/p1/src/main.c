@@ -12,9 +12,12 @@ int main(int argc, char* argv[]) {
     return(4);
   }
 
-  rc = read_beam_matrix(argv[1], matrix);
+  rc = read_beam_matrix(argv[1], &matrix);
   if (rc) {
     return rc;
   }
+
+  print_matrix(matrix);
+
   return 0;
 }

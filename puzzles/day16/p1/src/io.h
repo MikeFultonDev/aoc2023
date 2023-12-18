@@ -2,6 +2,6 @@
   #define __IO_INFO__ 1
 
   #include "cellinfo.h"
-  int read_beam_matrix(const char* cfname, struct BeamMatrix* matrix);
+  int read_beam_matrix(const char* cfname, struct BeamMatrix** matrix);
 
 #endif
