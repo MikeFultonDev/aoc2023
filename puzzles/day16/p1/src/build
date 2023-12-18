@@ -1,0 +1,5 @@
+set -e
+clang -c main.c
+clang -c io.c 
+clang -c cellinfo.c
+clang -obeam main.o io.o cellinfo.o

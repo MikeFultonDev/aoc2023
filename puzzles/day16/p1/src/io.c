@@ -1,9 +1,10 @@
 #include "io.h"
+#include "cellinfo.h"
 #include <stdio.h>
 #include <sys/stat.h>
 #include <stdlib.h>
 
-int read_beam_matrix(const char* cfname)
+int read_beam_matrix(const char* cfname, struct BeamMatrix* matrix)
 {
   struct stat st;
   if (stat(cfname, &st)) {
@@ -33,3 +34,10 @@ int read_beam_matrix(const char* cfname)
     fprintf(stderr, "Unable to close beam-matrix file %s\n", cfname);
     return(20);
   }
+
+  matrix = create_beam_matrix(data, bytes);
+  if (!matrix) {
+    return(24);
+  }
+  return 0;
+}

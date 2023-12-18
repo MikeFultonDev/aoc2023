@@ -1,8 +1,10 @@
 #ifndef __CELL_INFO__
   #define __CELL_INFO__ 1
 
+  #include <stddef.h>
+
   enum CellDevice {
-    None=0,
+    NoDevice=0,
     Slash=1,
     BackSlash=2,
     VerticalSplitter=3,
@@ -10,7 +12,7 @@
   };
 
   enum ActiveDirection {
-    None=0,
+    NoDirection=0,
     Up=0x1,
     Down=0x2,
     Left=0x4,
@@ -26,10 +28,10 @@
     int cols;
     int rows;
 
-    struct* BeamCell cells;
+    struct BeamCell* cells;
 
   };
 
-  struct* BeamMatrix create_matrix(const char* raw_data);
-  struct* BeamCell cell(struct* BeamMatrix matrix, int col, int row);
+  struct BeamMatrix* create_beam_matrix(const char* raw_data, size_t raw_data_len);
+  struct BeamCell* cell(struct BeamMatrix* matrix, int col, int row);
 #endif
