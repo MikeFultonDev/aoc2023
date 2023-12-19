@@ -29,8 +29,12 @@ function print_matrix(matrix)
   end
 end
 
-function calc_lowest_cost(matrix, directions, row, col, cost)
-  if cost > row*col*9 then return math.huge end
+function calc_lowest_cost(matrix, directions, visits, row, col, cost)
+  --print("cost: "..cost.." curlow: ".._Gcurlow)
+  if cost >= _Gcurlow then return math.huge end
+  if visits[row][col] > 0 then return math.huge end
+
+  visits[row][col] = 1
 
   local max_same_dir = 3
   if directions ~= nil and string.len(directions) >= max_same_dir then
@@ -47,37 +51,43 @@ function calc_lowest_cost(matrix, directions, row, col, cost)
     end
     if all_equal then 
       --print("Directions: "..directions.." equal")
+      visits[row][col] = 0
       return math.huge 
     end
   end
 
   if row == #matrix and col == #matrix[row] then 
     print("One solution: Direction: "..directions.." with cost:"..cost)
+    visits[row][col] = 0
     return cost 
   end
 
   local calc = { math.huge, math.huge, math.huge, math.huge }
-  if col > 1 then 
-    --Left
-    calc[1] = calc_lowest_cost(matrix, directions.."L", row, col-1, cost+matrix[row][col-1])
-  end
   if col < #matrix[row] then 
     --Right
-    calc[2] = calc_lowest_cost(matrix, directions.."R", row, col+1, cost+matrix[row][col+1])
-  end
-  if row > 1 then 
-    --Up
-    calc[3] = calc_lowest_cost(matrix, directions.."U", row-1, col, cost+matrix[row-1][col])
+    calc[1] = calc_lowest_cost(matrix, directions.."R", visits, row, col+1, cost+matrix[row][col+1])
   end
   if row < #matrix then 
     --Down
-    calc[4] = calc_lowest_cost(matrix, directions.."D", row+1, col, cost+cost + matrix[row+1][col])
+    calc[2] = calc_lowest_cost(matrix, directions.."D", visits, row+1, col, cost+matrix[row+1][col])
+  end
+  if col > 1 then 
+    --Left
+    calc[3] = calc_lowest_cost(matrix, directions.."L", visits, row, col-1, cost+matrix[row][col-1])
+  end
+  if row > 1 then 
+    --Up
+    calc[4] = calc_lowest_cost(matrix, directions.."U", visits, row-1, col, cost+matrix[row-1][col])
   end
   local min = math.huge
   for i, c in pairs(calc) do
     --print(c)
     min = math.min(min, c)
   end
+  if min < _Gcurlow then
+    _Gcurlow = min
+  end 
+  visits[row][col] = 0
   return min 
 end
 
@@ -112,7 +122,16 @@ print_matrix(matrix)
 -- The cheapest route will be no more than 9*nrows*ncols
 -- Use this as a high-water mark to avoid any infinite loops
 
+_Gcurlow = #matrix * #matrix[1] * 9
 local directions = ""
-local cost = calc_lowest_cost(matrix, directions, 1, 1, 0)
+local visits = {}
+local rows = #matrix
+for row = 1, rows do 
+  visits[row] = {} 
+  for col = 1, #matrix[row] do
+    visits[row][col] = 0
+  end
+end
+local cost = calc_lowest_cost(matrix, directions, visits, 1, 1, 0)
 
 print("Lowest Cost "..cost) 
