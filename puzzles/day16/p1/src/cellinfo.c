@@ -148,11 +148,11 @@ static enum ActiveDirection compute_new_direction(struct BeamMatrix* matrix, enu
     case Up:
       return (row > 0) ? Up : Blocked;
     case Down:
-      return (row < matrix->rows) ? Down : Blocked;
+      return (row < matrix->rows-1) ? Down : Blocked;
     case Left:
       return (col > 0) ? Left : Blocked;
     case Right:
-      return (col < matrix->cols) ? Right : Blocked;
+      return (col < matrix->cols-1) ? Right : Blocked;
     default:
       fprintf(stderr, "Unexpected direction for compute_new_direction %hhu\n", direction);
       return Blocked;
@@ -162,35 +162,41 @@ static enum ActiveDirection compute_new_direction(struct BeamMatrix* matrix, enu
 static int compute_new_location(struct BeamMatrix* matrix, enum ActiveDirection direction, size_t col, size_t row, struct BeamOutState* state, struct BeamState* beam)
 {
   state->num_directions = 1;
+  ssize_t row_inc = 0;
+  ssize_t col_inc = 0;
   switch (direction) {
     case Up: {
       beam->direction = compute_new_direction(matrix, direction, col, row);
-      beam->row = row-1;
-      beam->col = col;
-      return 0;
+      row_inc = -1;
+      break;
     }
     case Down: {
       beam->direction = compute_new_direction(matrix, direction, col, row);
-      beam->row = row+1;
-      beam->col = col;
-      return 0;
+      row_inc = 1;
+      break;
     }
     case Left: {
       beam->direction = compute_new_direction(matrix, direction, col, row);
-      beam->row = row;
-      beam->col = col-1;
-      return 0;
+      col_inc = -1;
+      break;
     }
     case Right: {
       beam->direction = compute_new_direction(matrix, direction, col, row);
-      beam->row = row;
-      beam->col = col+1;
-      return 0;
+      col_inc = 1;
+      break;
     }
     default:
       fprintf(stderr, "Unexpected direction for compute_new_location %hhu\n", direction);
       return 4;
   } 
+  if (beam->direction == Blocked) {
+    beam->col = col;
+    beam->row = row;
+  } else {
+    beam->col = col + col_inc;
+    beam->row = row + row_inc;
+  }
+  return 0;
 }
 
 static int compute_new_horizontal_locations(struct BeamMatrix* matrix, size_t col, size_t row, struct BeamOutState* out)
@@ -243,6 +249,9 @@ static int compute_to_state(struct BeamMatrix* matrix, struct BeamState* in, str
   if (!cell) {
     fprintf(stderr, "Unable to find cell at %zu %zu\n", in->col, in->row);
     return 16;
+  }
+  if (in->direction == Blocked) {
+    return 0;
   }
   out->num_directions = 0;
   enum CellDevice device = cell->device;
@@ -354,13 +363,17 @@ static void print_out_state(struct BeamOutState* out)
   }
 }
 
-size_t track_beam(struct BeamMatrix* matrix, struct BeamState* in)
+int track_beam(struct BeamMatrix* matrix, struct BeamState* in)
 {
   int rc;
-  size_t energized_cells = 0;
+  int errors = 0;
   struct BeamCell* cell = beam_cell(matrix, in->col, in->row);   
   if (cell->direction & in->direction) {
     return 0; // The beam has already gone through this cell in this direction
+  }
+
+  if (cell->direction == Blocked) {
+    return 0; // Team beam has hit the edge of a wall
   }
 
   cell->direction |= in->direction; // Add in this new beam direction
@@ -371,9 +384,25 @@ size_t track_beam(struct BeamMatrix* matrix, struct BeamState* in)
     return 0;
   }
 
-  print_out_state(&out);
+  //print_out_state(&out);
   for (size_t i=0; i<out.num_directions; ++i) {
-    energized_cells += track_beam(matrix, &out.beam[i]);
+    errors += track_beam(matrix, &out.beam[i]);
   }
-  return energized_cells;
+  return errors;
+}
+
+int energized_cells(struct BeamMatrix* matrix) 
+{
+  int energized = 0;
+  size_t row;
+  size_t col;
+  for (row=0; row<matrix->rows; ++row) {
+    for (col=0; col<matrix->cols; ++col) {
+      struct BeamCell* cell = beam_cell(matrix, col, row);
+      if (cell->direction != NoDirection) {
+        ++energized;
+      }
+    }
+  }
+  return energized;
 }

@@ -21,8 +21,10 @@ int main(int argc, char* argv[]) {
 
   print_matrix(matrix);
 
-  size_t energized_cells = track_beam(matrix, &beam_in);
-
-  printf("%zu energized cells\n", energized_cells);
-  return 0;
+  rc = track_beam(matrix, &beam_in);
+    
+  print_matrix(matrix);
+  
+  printf("%d Engergized cells\n", energized_cells(matrix));
+  return rc;
 }

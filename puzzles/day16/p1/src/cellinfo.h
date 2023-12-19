@@ -48,5 +48,6 @@
   int print_matrix(struct BeamMatrix* matrix);
   struct BeamCell* beam_cell(struct BeamMatrix* matrix, int col, int row);
 
-  size_t track_beam(struct BeamMatrix* matrix, struct BeamState* in);
+  int track_beam(struct BeamMatrix* matrix, struct BeamState* in);
+  int energized_cells(struct BeamMatrix* matrix);
 #endif
