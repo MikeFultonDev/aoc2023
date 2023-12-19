@@ -22,15 +22,47 @@ map_rawtext_to_commands()
 # An interesting way to simulate 2D arrays using an associative map
 # https://stackoverflow.com/questions/16487258/how-to-declare-2d-array-in-bash
 #
+
+print_grid()
+{
+  local startrow=$1
+  local startcol=$2
+  local endrow=$3
+  local endcol=$4
+
+  local row=$startrow
+
+  while [ ${row} -le ${endrow} ]; do
+    local col=$startcol
+    while [ ${col} -le ${endcol} ]; do
+      local val=${grid[(k)"${row},${col}"]}
+      if [ -z ${val} ]; then
+        printf "%s" '.'
+      else
+        key="${row},${col}"
+        printf "%s" "${val}"
+      fi
+      col=$((col+1))
+    done
+    row=$((row+1))
+    printf "\n"
+  done
+}
+      
 update_horizontal()
 {
   local row=$1
   local startcol=$2
   local length=$3
+  local c=$4
   local count=0
   while [ ${count} -lt ${length} ]; do
     local col=$((startcol+count))
-    grid[${row},${col}]='#'
+    local val=${grid[(k)"${row},${col}"]}
+    if [ -z ${val} ]; then
+      key="${row},${col}"
+      grid["${key}"]="$c"
+    fi
     count=$((count+1))
   done
 }
@@ -40,10 +72,15 @@ update_vertical()
   local col=$1
   local startrow=$2
   local length=$3
+  local c=$4
   local count=0
   while [ ${count} -lt ${length} ]; do
     local row=$((startrow+count))
-    grid[${row},${col}]='#'
+    local val=${grid[(k)"${row},${col}"]}
+    if [ -z ${val} ]; then
+      key="${row},${col}"
+      grid["${key}"]="$c"
+    fi
     count=$((count+1))
   done
 }
@@ -60,19 +97,19 @@ excavate()
   
   case ${direction} in
     R)
-      update_horizontal ${row} ${col} ${length}
+      update_horizontal ${row} $((col+1)) ${length} '#'
       col=$((col+length))
       ;;
     L)
-      update_horizontal ${row} $((col-length)) ${length}
+      update_horizontal ${row} $((col-length)) ${length} '#'
       col=$((col-length))
       ;;
     D)
-      update_vertical ${col} ${row} ${length}
+      update_vertical ${col} $((row+1)) ${length} '#'
       row=$((row+length))
       ;;
     U)
-      update_vertical ${col} $((row-length)) ${length}
+      update_vertical ${col} $((row-length)) ${length} '#'
       row=$((row-length))
       ;;
   esac
@@ -95,6 +132,7 @@ excavate()
 
 declare -a rawtext
 declare -a dig
+dig=()
 
 if [ $# -lt 1 ]; then
   echo "Syntax: ${ZSH_ARGZERO} <mapfile>" >&2
@@ -109,7 +147,8 @@ if ! map_rawtext_to_commands ; then
   exit 4
 fi
 
-declare -a grid
+declare -A grid
+grid=()
 
 local dignum=1
 
@@ -119,7 +158,8 @@ local dignum=1
 #
 col=1000
 row=1000
-grid[${row},${col}]='#'
+key="${row},${col}"
+grid["${key}"]='#'
 
 maxcol=0
 maxrow=0
@@ -137,3 +177,4 @@ done
 
 echo "Range: ${minrow},${mincol} to ${maxrow},${maxcol}"
 
+print_grid ${minrow} ${mincol} ${maxrow} ${maxcol}
