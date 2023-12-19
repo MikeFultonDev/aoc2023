@@ -3,3 +3,4 @@
 *.kt zos-working-tree-encoding=IBM-1047
 universe*.txt zos-working-tree-encoding=IBM-1047
 *.zsh zos-working-tree-encoding=IBM-1047
+lagoon*.txt zos-working-tree-encoding=IBM-1047
