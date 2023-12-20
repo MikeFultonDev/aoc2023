@@ -48,7 +48,33 @@ print_grid()
     printf "\n"
   done
 }
-      
+
+set_cell()
+{
+  local row=$1
+  local col=$2
+  local c=$3
+  local val=${grid[(k)"${row},${col}"]}
+  if [ -z ${val} ]; then
+    key="${row},${col}"
+    grid["${key}"]="$c"
+  fi
+}
+
+flood_fill()
+{
+  local startrow=$1
+  local startcol=$2
+  local endrow=$3
+  local endcol=$4
+  local out="O"
+
+  set_cell ${startrow} ${startcol} ${out}
+  set_cell ${startrow} ${endcol} ${out}
+  set_cell ${endrow} ${startcol} ${out}
+  set_cell ${endrow} ${endcol} ${out}
+}
+
 update_horizontal()
 {
   local row=$1
@@ -114,17 +140,21 @@ excavate()
       ;;
   esac
   echo "${row},${col}"
+
+  #
+  # Give an edge around the min/max
+  #
   if [ ${minrow} -gt ${row} ]; then
-    minrow=${row}
+    minrow=$((row-2))
   fi
   if [ ${mincol} -gt ${col} ]; then
-    mincol=${col}
+    mincol=$((col-2))
   fi
   if [ ${maxrow} -lt ${row} ]; then
-    maxrow=${row}
+    maxrow=$((row+2))
   fi
   if [ ${maxcol} -lt ${col} ]; then
-    maxcol=${col}
+    maxcol=$((col+2))
   fi
 
   return 0 
@@ -180,5 +210,15 @@ while [ ${dignum} -le ${#dig[@]} ]; do
 done
 
 echo "Range: ${minrow},${mincol} to ${maxrow},${maxcol}"
+
+print_grid ${minrow} ${mincol} ${maxrow} ${maxcol}
+
+#
+# The dig lines cross over each other so safe approach
+# is to start from the 4 corners and paint the outside
+# (blank edge was inserted to ensure this is 'safe')
+#
+
+flood_fill ${minrow} ${mincol} ${maxrow} ${maxcol}
 
 print_grid ${minrow} ${mincol} ${maxrow} ${maxcol}
