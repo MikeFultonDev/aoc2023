@@ -72,23 +72,24 @@ fill_in_grid()
 
 set_cell()
 {
-  local row=$1
-  local col=$2
-  local c=$3
-  local key="${row},${col}"
-  grid["${key}"]="$c"
-  local val=${grid[(k)"${key}"]}
-  #echo "set: cell[$key] is ${val}" >&2
+  local srow=$1
+  local scol=$2
+  local sc=$3
+  local skey="${srow},${scol}"
+
+  grid["${skey}"]="$sc"
+  #local sval=${grid[(k)"${skey}"]}
+  #echo "set: cell[$key] is ${sval}" >&2
 }
 
 get_cell()
 {
-  local row=$1
-  local col=$2
-  local key="${row},${col}"
-  local val=${grid[(k)"${key}"]}
-  #echo "get: cell[$key] is ${val}" >&2
-  echo "${val}"
+  local grow=$1
+  local gcol=$2
+  local gkey="${grow},${gcol}"
+  local gval=${grid[(k)"${gkey}"]}
+  #echo "get: cell[$gkey] is ${gval}" >&2
+  echo "${gval}"
   return 0
 }
 
@@ -128,6 +129,13 @@ set_neighbour_dots()
     set_cell ${rrow} ${col} "${out}"
     context="update"
   fi
+local key=''
+local value=''
+for key value in ${(kv)grid}; do
+  echo "$key -> $value" >&2
+done
+exit 0
+
   #echo "cell[$row][$col] ${context}" >&2
   echo "${context}"
   return 0
