@@ -142,6 +142,8 @@ fi
 mapfile=$1
 rawtext=("${(@f)$(< ${mapfile})}")
 
+echo "Map raw text to commands"
+
 if ! map_rawtext_to_commands ; then
   echo "Mapping failed" >&2
   exit 4
@@ -165,6 +167,8 @@ maxcol=0
 maxrow=0
 mincol=$((col*10000))
 minrow=$((row*10000))
+
+echo "Start excavating"
 
 while [ ${dignum} -le ${#dig[@]} ]; do
   echo "${dig[${dignum}]}"
