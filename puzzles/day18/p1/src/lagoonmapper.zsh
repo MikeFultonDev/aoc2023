@@ -35,8 +35,7 @@ print_grid()
   while [ ${row} -le ${endrow} ]; do
     local col=$startcol
     while [ ${col} -le ${endcol} ]; do
-      local key="${row},${col}"
-      local val=${grid[(k)"${key}"]}
+      local val=$(get_cell ${row} ${col})
       if [ -z ${val} ]; then
         printf "%s" '?'
       else
@@ -61,10 +60,9 @@ fill_in_grid()
   while [ ${row} -le ${endrow} ]; do
     local col=$startcol
     while [ ${col} -le ${endcol} ]; do
-      local key="${row},${col}"
-      local val=${grid[(k)"${key}"]}
+      local val=$(get_cell ${row} ${col})
       if [ -z ${val} ]; then
-        grid["${key}"]='.'
+        set_cell ${row} ${col} "." 
       fi
       col=$((col+1))
     done
@@ -80,7 +78,7 @@ set_cell()
   local key="${row},${col}"
   grid["${key}"]="$c"
   local val=${grid[(k)"${key}"]}
-  echo "set: cell[$key] is ${val}" >&2
+  #echo "set: cell[$key] is ${val}" >&2
 }
 
 get_cell()
@@ -89,7 +87,7 @@ get_cell()
   local col=$2
   local key="${row},${col}"
   local val=${grid[(k)"${key}"]}
-  echo "get: cell[$key] is ${val}" >&2
+  #echo "get: cell[$key] is ${val}" >&2
   echo "${val}"
   return 0
 }
@@ -143,6 +141,7 @@ flood_fill()
   local endcol=$4
   local out="O"
 
+  print_grid ${startrow} ${startcol} ${endrow} ${endcol}
   set_cell ${startrow} ${startcol} ${out}
   set_cell ${startrow} ${endcol} ${out}
   set_cell ${endrow} ${startcol} ${out}
@@ -151,18 +150,18 @@ flood_fill()
   local context="update"
   local iters=0
   while [ "${context}" = "update" ]; do
+    print_grid ${startrow} ${startcol} ${endrow} ${endcol}
     echo "Iterate on flood"
     iters=$((iters+1))
     if [ $iters -gt 3 ]; then 
       return 0
     fi
-    print_grid ${startrow} ${startcol} ${endrow} ${endcol}
     context="nochange"
     local row=$startrow
     while [ ${row} -le ${endrow} ]; do
       local col=$startcol
       while [ ${col} -le ${endcol} ]; do
-        local val=${grid[(k)"${row},${col}"]}
+        local val=$(get_cell ${row} ${col})
         if [ -z ${val} ]; then
           echo "All cells should be set now" >&2
         else
@@ -189,10 +188,9 @@ update_horizontal()
   local count=0
   while [ ${count} -lt ${length} ]; do
     local col=$((startcol+count))
-    local key="${row},${col}"
-    local val=${grid[(k)"${key}"]}
+    local val=$(get_cell ${row} ${col})
     if [ -z ${val} ]; then
-      grid["${key}"]="$c"
+      set_cell ${row} ${col} "$c"
     fi
     count=$((count+1))
   done
@@ -207,10 +205,9 @@ update_vertical()
   local count=0
   while [ ${count} -lt ${length} ]; do
     local row=$((startrow+count))
-    local key="${row},${col}"
-    local val=${grid[(k)"${key}"]}
+    local val=$(get_cell ${row} ${col})
     if [ -z ${val} ]; then
-      grid["${key}"]="$c"
+      set_cell ${row} ${col} "$c"
     fi
     count=$((count+1))
   done
@@ -291,8 +288,7 @@ fi
 #
 col=1000
 row=1000
-local key="${row},${col}"
-grid["${key}"]='#'
+set_cell ${row} ${col} "#"
 
 maxcol=0
 maxrow=0
