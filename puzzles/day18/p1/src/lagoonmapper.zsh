@@ -35,11 +35,11 @@ print_grid()
   while [ ${row} -le ${endrow} ]; do
     local col=$startcol
     while [ ${col} -le ${endcol} ]; do
-      local val=${grid[(k)"${row},${col}"]}
+      local key="${row},${col}"
+      local val=${grid[(k)"${key}"]}
       if [ -z ${val} ]; then
-        printf "%s" '.'
+        printf "%s" '?'
       else
-        key="${row},${col}"
         printf "%s" "${val}"
       fi
       col=$((col+1))
@@ -49,16 +49,90 @@ print_grid()
   done
 }
 
+fill_in_grid()
+{
+  local startrow=$1
+  local startcol=$2
+  local endrow=$3
+  local endcol=$4
+
+  local row=$startrow
+
+  while [ ${row} -le ${endrow} ]; do
+    local col=$startcol
+    while [ ${col} -le ${endcol} ]; do
+      local key="${row},${col}"
+      local val=${grid[(k)"${key}"]}
+      if [ -z ${val} ]; then
+        grid["${key}"]='.'
+      fi
+      col=$((col+1))
+    done
+    row=$((row+1))
+  done
+}
+
 set_cell()
 {
   local row=$1
   local col=$2
   local c=$3
-  local val=${grid[(k)"${row},${col}"]}
-  if [ -z ${val} ]; then
-    key="${row},${col}"
-    grid["${key}"]="$c"
+  local key="${row},${col}"
+  grid["${key}"]="$c"
+  local val=${grid[(k)"${key}"]}
+  echo "set: cell[$key] is ${val}" >&2
+}
+
+get_cell()
+{
+  local row=$1
+  local col=$2
+  local key="${row},${col}"
+  local val=${grid[(k)"${key}"]}
+  echo "get: cell[$key] is ${val}" >&2
+  echo "${val}"
+  return 0
+}
+
+set_neighbour_dots()
+{
+  local startrow=$1
+  local startcol=$2
+  local endrow=$3
+  local endcol=$4
+  local row=$5
+  local col=$6
+  local out=$7
+  local context="nochange"
+
+  local lcol=$((col-1))
+  local rcol=$((col+1))
+  local lrow=$((row-1))
+  local rrow=$((row+1))
+  local c
+  c=$(get_cell ${row} ${lcol})
+  if [ "$c" = "." ] ; then
+    set_cell ${row} ${lcol} "${out}"
+    context="update"
   fi
+  c=$(get_cell ${row} ${rcol})
+  if [ "$c" = "." ] ; then
+    set_cell ${row} ${rcol} "${out}"
+    context="update"
+  fi
+  c=$(get_cell ${lrow} ${col})
+  if [ "$c" = "." ] ; then
+    set_cell ${lrow} ${col} "${out}"
+    context="update"
+  fi
+  c=$(get_cell ${rrow} ${col})
+  if [ "$c" = "." ] ; then
+    set_cell ${rrow} ${col} "${out}"
+    context="update"
+  fi
+  #echo "cell[$row][$col] ${context}" >&2
+  echo "${context}"
+  return 0
 }
 
 flood_fill()
@@ -73,6 +147,37 @@ flood_fill()
   set_cell ${startrow} ${endcol} ${out}
   set_cell ${endrow} ${startcol} ${out}
   set_cell ${endrow} ${endcol} ${out}
+
+  local context="update"
+  local iters=0
+  while [ "${context}" = "update" ]; do
+    echo "Iterate on flood"
+    iters=$((iters+1))
+    if [ $iters -gt 3 ]; then 
+      return 0
+    fi
+    print_grid ${startrow} ${startcol} ${endrow} ${endcol}
+    context="nochange"
+    local row=$startrow
+    while [ ${row} -le ${endrow} ]; do
+      local col=$startcol
+      while [ ${col} -le ${endcol} ]; do
+        local val=${grid[(k)"${row},${col}"]}
+        if [ -z ${val} ]; then
+          echo "All cells should be set now" >&2
+        else
+          if [ "${val}" = "${out}" ]; then
+            local thiscontext=$(set_neighbour_dots ${startrow} ${startcol} ${endrow} ${endcol} ${row} ${col} "${out}")
+            if [ "${thiscontext}" = "update" ]; then
+              context="update"
+            fi
+          fi
+        fi
+        col=$((col+1))
+      done
+      row=$((row+1))
+    done
+  done
 }
 
 update_horizontal()
@@ -84,9 +189,9 @@ update_horizontal()
   local count=0
   while [ ${count} -lt ${length} ]; do
     local col=$((startcol+count))
-    local val=${grid[(k)"${row},${col}"]}
+    local key="${row},${col}"
+    local val=${grid[(k)"${key}"]}
     if [ -z ${val} ]; then
-      key="${row},${col}"
       grid["${key}"]="$c"
     fi
     count=$((count+1))
@@ -102,9 +207,9 @@ update_vertical()
   local count=0
   while [ ${count} -lt ${length} ]; do
     local row=$((startrow+count))
-    local val=${grid[(k)"${row},${col}"]}
+    local key="${row},${col}"
+    local val=${grid[(k)"${key}"]}
     if [ -z ${val} ]; then
-      key="${row},${col}"
       grid["${key}"]="$c"
     fi
     count=$((count+1))
@@ -139,7 +244,6 @@ excavate()
       row=$((row-length))
       ;;
   esac
-  echo "${row},${col}"
 
   #
   # Give an edge around the min/max
@@ -163,13 +267,15 @@ excavate()
 declare -a rawtext
 declare -a dig
 dig=()
+declare -A grid
+grid=()
 
 if [ $# -lt 1 ]; then
   echo "Syntax: ${ZSH_ARGZERO} <mapfile>" >&2
   exit 4
 fi
 
-mapfile=$1
+local mapfile=$1
 rawtext=("${(@f)$(< ${mapfile})}")
 
 echo "Map raw text to commands"
@@ -179,18 +285,13 @@ if ! map_rawtext_to_commands ; then
   exit 4
 fi
 
-declare -A grid
-grid=()
-
-local dignum=1
-
 #
 # Set the starting point to be a number in the 'middle' of the grid
 # It will keep the math simpler
 #
 col=1000
 row=1000
-key="${row},${col}"
+local key="${row},${col}"
 grid["${key}"]='#'
 
 maxcol=0
@@ -200,6 +301,7 @@ minrow=$((row*10000))
 
 echo "Start excavating"
 
+local dignum=1
 while [ ${dignum} -le ${#dig[@]} ]; do
   echo "${dig[${dignum}]}"
   if ! excavate ${dig[${dignum}]} ; then
@@ -210,6 +312,8 @@ while [ ${dignum} -le ${#dig[@]} ]; do
 done
 
 echo "Range: ${minrow},${mincol} to ${maxrow},${maxcol}"
+
+fill_in_grid ${minrow} ${mincol} ${maxrow} ${maxcol}
 
 print_grid ${minrow} ${mincol} ${maxrow} ${maxcol}
 
