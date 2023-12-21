@@ -131,7 +131,8 @@ set_neighbour_dots()
   fi
 local key=''
 local value=''
-for key value in ${(kv)grid}; do
+echo "Type of grid: ${(t)grid}" >&2
+for key value in ${(kv@)grid}; do
   echo "$key -> $value" >&2
 done
 exit 0
@@ -272,8 +273,7 @@ excavate()
 declare -a rawtext
 declare -a dig
 dig=()
-declare -A grid
-grid=()
+typeset -A grid
 
 if [ $# -lt 1 ]; then
   echo "Syntax: ${ZSH_ARGZERO} <mapfile>" >&2

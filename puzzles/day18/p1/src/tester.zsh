@@ -28,9 +28,14 @@ echo "$entry"
 col=7
 row=7
 set_grid $col $row 'A'
+set_grid $col $row 'A'
 row=8
 set_grid $col $row 'B'
 row=7
+set_grid $col $row 'A'
+set_grid $col $row 'A'
+set_grid $col $row 'A'
+set_grid $col $row 'A'
 set_grid $col $row 'A'
 
 for key value in ${(kv)grid}; do
