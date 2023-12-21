@@ -14,7 +14,7 @@ class Part {
     Reader r = new StringReader(this._partLine);
     StreamTokenizer st = new StreamTokenizer(r);
     List<Object> tokens = new ArrayList<Object>();
-    double token;
+    int token;
 
     // Sample line: {x=2127,m=1623,a=2188,s=1013}
     // No error checking for invalid lines
