@@ -47,17 +47,21 @@ class Part {
 
   private String _partLine;
 
-  public long x() {
+  long x() {
     return Double.valueOf(this._x).longValue();
   }
-  public long m() {
+  long m() {
     return Double.valueOf(this._m).longValue();
   }
-  public long a() {
+  long a() {
     return Double.valueOf(this._a).longValue();
   }
-  public long s() {
+  long s() {
     return Double.valueOf(this._s).longValue();
+  }
+
+  long rating() {
+    return x() + m() + a() + s();
   }
 
   public String toString() {

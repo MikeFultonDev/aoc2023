@@ -65,6 +65,25 @@ class Main {
       workflows.add(w);
     }
 
+    Workflow start = Workflow.find(workflows, "in");
+    for (Part part : parts) {
+      System.out.println("Part: " + part);
+      Workflow cur = start;
+      String next = cur.process(part);
+      while (!next.equals("A") && !next.equals("R")) {
+        System.out.println("workflow: " + cur);
+        cur = Workflow.find(workflows, next);
+        next = cur.process(part);
+      }
+      if (next.equals("A")) {
+        _tot += part.rating();
+        System.out.println("Part accepted. Total now: " + _tot);
+      }
+      if (next.equals("R")) {
+        System.out.println("Part rejected");
+      }
+    }    
+
     return false;
   }
 

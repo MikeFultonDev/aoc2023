@@ -11,6 +11,15 @@ class Workflow {
     parse();
   }
 
+  static Workflow find(List<Workflow> workflows, String name) {
+    for (Workflow workflow : workflows) {
+      if (workflow.name().equals(name)) {
+        return workflow;
+      }
+    }
+    return null;
+  }
+
   private void parse() throws java.io.IOException {
     Reader r = new StringReader(this._workflowLine);
     StreamTokenizer st = new StreamTokenizer(r);
@@ -46,21 +55,37 @@ class Workflow {
         }
       }
     }
-    this._workflowTarget = curVar;
+    this._workflowDefaultTarget = curVar;
   }
 
+  String process(Part part) {
+    if (this._conditions != null) {
+      for (WorkflowCondition wfc : this._conditions) {
+        String target = wfc.match(part);
+        if (target != null) {
+          return target; 
+        }
+      }
+    }
+    // No conditions match, return 'otherwise' rule
+    return this._workflowDefaultTarget;
+  }
+      
   public String toString() {
     String out = "Workflow: " + _workflowName + " : ";
     for (WorkflowCondition wfc : _conditions) {
       out = out + wfc + ", ";
     }
-    out = out + _workflowTarget;
+    out = out + _workflowDefaultTarget;
     return out;
   }
 
+  public String name() {
+    return _workflowName;
+  }
   private String _workflowLine;
   private String _workflowName;
-  private String _workflowTarget;
+  private String _workflowDefaultTarget;
   private List<WorkflowCondition> _conditions;
 }
 
