@@ -30,7 +30,12 @@ class Main {
   }
 
   private boolean processWorkflows() {
-    ArrayList<String> lines = new ArrayList<String>();
+    ArrayList<String> workflowLines = new ArrayList<String>();
+    ArrayList<String> partLines = new ArrayList<String>();
+    ArrayList<Workflow> workflows = new ArrayList<Workflow>();
+    ArrayList<Part> parts = new ArrayList<Part>();
+    ArrayList<String> lines = workflowLines;
+    ProcessingState state = ProcessingState.ProcessingWorkflows;
     try {
       BufferedReader br = new BufferedReader(new FileReader(this._workflowFile));
       String l;
@@ -38,12 +43,28 @@ class Main {
         String trimline = l.trim();
         if (!trimline.equals("")) {
           lines.add(trimline);
+        } else {
+          if (state == ProcessingState.ProcessingWorkflows) {
+            state = ProcessingState.ProcessingParts;
+            lines = partLines;
+          }
         }
       }
-
     } catch (IOException e) {
       System.err.println("Error " + e + " encountered trying to process workflow file " + this._workflowFile);
       return true;
+    }
+
+    System.out.println("Parts");
+    for (String part : partLines) {
+      System.out.println(part);
+      parts.add(new Part(part));
+    }
+    System.out.println();
+    System.out.println("Workflows");
+    for (String workflow : workflowLines) {
+      System.out.println(workflow);
+      workflows.add(new Workflow(workflow));
     }
 
     return false;
@@ -55,5 +76,6 @@ class Main {
 
   private long _tot;
   private String _workflowFile;
+  private enum ProcessingState { ProcessingWorkflows, ProcessingParts };
 }
 
