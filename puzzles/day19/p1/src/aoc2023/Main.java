@@ -60,8 +60,9 @@ class Main {
     System.out.println();
     System.out.println("Workflows");
     for (String workflow : workflowLines) {
-      System.out.println(workflow);
-      workflows.add(new Workflow(workflow));
+      Workflow w = new Workflow(workflow);
+      System.out.println(w);
+      workflows.add(w);
     }
 
     return false;

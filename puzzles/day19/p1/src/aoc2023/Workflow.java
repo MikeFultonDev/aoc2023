@@ -6,7 +6,7 @@ import java.io.Reader;
 import java.io.StreamTokenizer;
 
 class Workflow {
-  Workflow(String workflowLine) {
+  Workflow(String workflowLine) throws java.io.IOException {
     this._workflowLine = workflowLine;
     parse();
   }
@@ -20,10 +20,11 @@ class Workflow {
     // Sample line: px{a<2006:qkq,m>2090:A,rfg}
     // No error checking for invalid lines
     String curVar = "";
-    double curVal;
+    double curVal = 0;
     WorkflowCondition curCondition = null; 
 
-    this._workflowName = st.nextToken().sval;
+    st.nextToken();
+    this._workflowName = st.sval;
     this._conditions = new ArrayList<WorkflowCondition>();
 
     while ((token = st.nextToken()) != StreamTokenizer.TT_EOF) {
@@ -33,17 +34,29 @@ class Workflow {
         curVal = st.nval;
       } else {
         if (st.ttype == '<' || st.ttype == '>') {
-          curCondition = new WorkflowCondition(st.ttype);
-          this._conditions.add(curCondition); 
+          curCondition = new WorkflowCondition();
+          curCondition.setVar(curVar);
+          curCondition.setComparison(st.ttype);
         } else if (st.ttype == ':') {
           curCondition.setVal(curVal);
         } else if (st.ttype == ',') {
           curCondition.setTarget(curVar);
+          this._conditions.add(curCondition); 
           curCondition = null; 
         }
       }
     }
     this._workflowTarget = curVar;
+  }
+
+  public String toString() {
+    String out = "Workflow: " + _workflowName + " : ";
+    for (WorkflowCondition wfc : _conditions) {
+      out = out + wfc + ", ";
+    }
+    out = out + _workflowTarget;
+    return out;
+  }
 
   private String _workflowLine;
   private String _workflowName;
