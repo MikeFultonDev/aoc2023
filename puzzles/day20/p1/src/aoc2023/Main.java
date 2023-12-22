@@ -4,7 +4,8 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
+import java.util.Map;
+import java.util.HashMap;
 
 class Main {
   public static void main(String args[]) throws java.io.IOException {
@@ -30,16 +31,19 @@ class Main {
   }
 
   private boolean processConfigs() throws java.io.IOException {
-    ArrayList<String> configLines = new ArrayList<String>();
+
+    List<String> configLines = new ArrayList<String>();
 
     BufferedReader br = new BufferedReader(new FileReader(this._configFile));
     String l;
     while ((l = br.readLine()) != null) {
-      String trimline = l.trim();
-      if (!trimline.equals("")) {
-        configLines.add(trimline);
+      String trimLine = l.trim();
+      if (!trimLine.equals("")) {
+        configLines.add(trimLine);
       }
     }
+    ModuleConfiguration moduleConfiguration = new ModuleConfiguration(configLines);
+    
     return false;
   }
 
