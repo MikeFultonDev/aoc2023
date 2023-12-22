@@ -7,12 +7,17 @@ map_rawtext_to_commands()
 {
   # rawtext will be read, and dig array will be created
   local row=1
-  local rows=${#rawtext[@]}
+  local rows=${#rawtext}
   while [ ${row} -le ${rows} ] ; do
-    local line=${rawtext[${row}]}
-    local dir=$(echo ${line} | cut -d " " -f 1)
-    local len=$(echo ${line} | cut -d " " -f 2)
+    local cmd=${rawtext[${row}]}
+    local dir=$(echo "${cmd}" | awk '{ print $1 }')
+    local len=$(echo "${cmd}" | awk '{ print $2 }')
     dig[${row}]="${dir}:${len}"
+    if [ "x${dir}" = "x" ] || [ "x${len}" = "x" ]; then
+      echo "Error parsing line: ${cmd} (dir is ${dir} and len is ${len})" >&2
+      typeset -p rawtext
+      exit 4
+    fi
     row=$((row+1))
   done
   return 0
@@ -31,7 +36,7 @@ set_cell()
   local skey="${srow},${scol}"
 
   grid["${skey}"]="$sc"
-  echo "set $srow $scol $sc" >&2
+  #echo "set $srow $scol $sc" >&2
 }
 
 get_cell()
@@ -43,7 +48,7 @@ get_cell()
   if [ "x${gval}" = "x" ]; then 
     gval="${EMPTY}"
   fi
-  echo "get $grow $gcol -> $gval" >&2
+  #echo "get $grow $gcol -> $gval" >&2
   return ${gval}
 }
 
@@ -78,6 +83,36 @@ print_grid()
     row=$((row+1))
     printf "\n"
   done
+}
+
+count_dug_and_empty()
+{
+  local startrow=$1
+  local startcol=$2
+  local endrow=$3
+  local endcol=$4
+
+  local row=$startrow
+
+  tot=0
+  while [ ${row} -le ${endrow} ]; do
+    local col=$startcol
+    while [ ${col} -le ${endcol} ]; do
+      get_cell "${row}" "${col}"
+      val=$?
+      case $val in
+        $DUG)
+          tot=$((tot+1))
+          ;;
+        $EMPTY)
+          tot=$((tot+1))
+          ;;
+      esac
+      col=$((col+1))
+    done
+    row=$((row+1))
+  done
+  return $tot
 }
 
 fill_in_grid()
@@ -119,7 +154,6 @@ set_neighbour_dots()
   local rrow=$((nrow+1))
   local cval 
 
-set -x
   get_cell "${nrow}" "${lcol}"
   cval=$?
   if [ ${cval} -eq ${EMPTY} ] ; then
@@ -144,7 +178,6 @@ set -x
     set_cell "${rrow}" "${ncol}" "${OUT}"
     context=${UPDATE}
   fi
-set +x
 
   #echo "cell[$row][$col] ${context}" >&2
   return ${context}
@@ -157,27 +190,22 @@ flood_fill()
   local endrow=$3
   local endcol=$4
 
-  print_grid "${startrow}" "${startcol}" "${endrow}" "${endcol}"
+  #print_grid "${startrow}" "${startcol}" "${endrow}" "${endcol}"
   set_cell "${startrow}" "${startcol}" "${OUT}"
   set_cell "${startrow}" "${endcol}" "${OUT}"
   set_cell "${endrow}" "${startcol}" "${OUT}"
   set_cell "${endrow}" "${endcol}" "${OUT}"
 
-  typeset -p grid >&2
-
   local context=${UPDATE}
   local iters=0
   while [ ${context} -eq ${UPDATE} ]; do
-    typeset -p grid >&2
-    print_grid "${startrow}" "${startcol}" "${endrow}" "${endcol}" 
-    echo "Iterate on flood"
+    #print_grid "${startrow}" "${startcol}" "${endrow}" "${endcol}" 
+    echo "Iteration ${iters} on flood"
     iters=$((iters+1))
-    if [ $iters -gt 3 ]; then 
-      return 0
-    fi
     context=${NOCHANGE}
     local row=$startrow
     while [ ${row} -le ${endrow} ]; do
+    echo "..row ${row}"
       local col=$startcol
       while [ ${col} -le ${endcol} ]; do
         get_cell "${row}" "${col}"
@@ -290,7 +318,6 @@ fi
 
 local mapfile=$1
 rawtext=("${(@f)$(< ${mapfile})}")
-
 echo "Map raw text to commands"
 
 if ! map_rawtext_to_commands ; then
@@ -343,6 +370,12 @@ print_grid "${minrow}" "${mincol}" "${maxrow}" "${maxcol}"
 # (blank edge was inserted to ensure this is 'safe')
 #
 
+echo "Perform flood fill"
 flood_fill "${minrow}" "${mincol}" "${maxrow}" "${maxcol}"
 
 print_grid "${minrow}" "${mincol}" "${maxrow}" "${maxcol}"
+
+count_dug_and_empty "${minrow}" "${mincol}" "${maxrow}" "${maxcol}"
+total=$?
+
+echo "${total} cubic meters of lava can be held by the lagoon"
