@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 class ButtonModule extends Module {
-  ButtonModule(String name) {
-    super(name);
+  ButtonModule(String name, List<String> targetNames) {
+    super(name, targetNames);
+  }
+  @Override
+  public String prefix() {
+    return "";
   }
 }

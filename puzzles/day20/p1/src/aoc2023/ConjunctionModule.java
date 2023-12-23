@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 class ConjunctionModule extends Module {
-  ConjunctionModule(String name) {
-    super(name);
+  ConjunctionModule(String name, List<String> targetNames) {
+    super(name, targetNames);
+  }
+  @Override
+  public String prefix() {
+    return "&";
   }
 }

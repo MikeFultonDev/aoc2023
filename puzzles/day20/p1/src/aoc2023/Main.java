@@ -43,6 +43,9 @@ class Main {
       }
     }
     ModuleConfiguration moduleConfiguration = new ModuleConfiguration(configLines);
+
+    System.out.println(moduleConfiguration);
+    moduleConfiguration.run();
     
     return false;
   }

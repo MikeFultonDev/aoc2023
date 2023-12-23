@@ -2,12 +2,14 @@ package aoc2023;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-class Module {
-  Module(String name) {
+abstract class Module {
+  Module(String name, List<String> targetNames) {
     this._name = name;
+    this._targetNames = targetNames;
   }
-  public static Module create(String decoratedName) throws java.io.IOException {
+  public static Module create(String decoratedName, List<String> targetNames) throws java.io.IOException {
     String name;
     ModuleType type;
     if (decoratedName.startsWith("%")) {
@@ -27,19 +29,33 @@ class Module {
       }
     }
     switch (type) {
-      case FlipFlop: return new FlipFlopModule(name);
-      case Conjunction: return new ConjunctionModule(name);
-      case Broadcast: return new BroadcastModule(name);
-      case Button: return new ButtonModule(name);
-      default: return null;
+      case FlipFlop: return new FlipFlopModule(name, targetNames);
+      case Conjunction: return new ConjunctionModule(name, targetNames);
+      case Broadcast: return new BroadcastModule(name, targetNames);
+      case Button: return new ButtonModule(name, targetNames);
+      default: System.err.println("Should not get here. Type is: " + type); return null;
     }
   } 
+  public String name() {
+    return _name;
+  }
 
-  private enum ModuleType { FlipFlop, Conjunction, Broadcast, Button };
-  private String _name;
+  abstract public String prefix();
 
   @Override
-  public int hashCode() {
-    return _name.hashCode();
+  public String toString() {
+    String out = prefix() + name();
+    if (_targetNames != null) {
+      out = out + " ->";
+      for (String targetName : _targetNames) {
+        out = out + " " + targetName;
+      }
+    }
+    return out;
   }
+
+  private enum ModuleType { FlipFlop, Conjunction, Broadcast, Button };
+  protected String _name;
+  private List<String> _targetNames;
+  private Map<String, Module> _entries;
 }
