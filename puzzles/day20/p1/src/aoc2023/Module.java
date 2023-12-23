@@ -41,6 +41,7 @@ abstract class Module {
   }
 
   abstract public String prefix();
+  abstract public List<String> processPulse(Pulse source);
 
   @Override
   public String toString() {
@@ -54,8 +55,14 @@ abstract class Module {
     return out;
   }
 
+  List<String> targetNames() {
+    return _targetNames;
+  }
+
   private enum ModuleType { FlipFlop, Conjunction, Broadcast, Button };
   protected String _name;
   private List<String> _targetNames;
   private Map<String, Module> _entries;
+
+  protected final static List<String> EMPTY_TARGET_LIST = new ArrayList<String>();
 }
