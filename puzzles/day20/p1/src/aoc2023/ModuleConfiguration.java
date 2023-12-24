@@ -11,7 +11,9 @@ class ModuleConfiguration {
     _entriesList = new ArrayList<Module>();
     List<String> buttonTarget = new ArrayList<String>();
     buttonTarget.add("broadcaster");
-    this._entriesList.add(Module.create("button", buttonTarget));
+    Module buttonModule = Module.create("button", buttonTarget);
+    this._entriesList.add(buttonModule);
+    this._entriesMap.put("button", buttonModule);
     for (String line : lines) {
       ModuleConfigurationEntry entry = new ModuleConfigurationEntry(line, this._entriesMap);
       this._entriesList.add(entry.getModule());
@@ -41,8 +43,25 @@ class ModuleConfiguration {
     return out;
   }
 
-  void run() {
+  private void processPulses(List<Pulse> pulses) {
+    for (Pulse pulse : pulses) {
+      System.out.println("Pulse source " + pulse.source() + "->" + pulse.targets());
+    }
+    
+    for (Pulse pulse : pulses) {
+      for (String target : pulse.targets()) {
+        List<Pulse> targetPulses = _entriesMap.get(target).processPulse(pulse);
+        processPulses(targetPulses);
+      }
+    }
   }
+
+  void run() {
+    Module buttonModule = _entriesMap.get("button");
+    List<Pulse> pulses = buttonModule.processPulse(null);
+    processPulses(pulses);
+  }
+
   private List<Module> _entriesList;
   private Map<String, Module> _entriesMap;
 }

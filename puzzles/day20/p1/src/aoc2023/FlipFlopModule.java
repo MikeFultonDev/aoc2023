@@ -6,7 +6,7 @@ import java.util.List;
 class FlipFlopModule extends Module {
   FlipFlopModule(String name, List<String> targetNames) {
     super(name, targetNames);
-    _moduleState.setOff();
+    _moduleState = new ModuleState(ModuleState.OFF);
   }
   @Override
   public String prefix() {

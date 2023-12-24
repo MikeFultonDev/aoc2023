@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 class ModuleState {
-  ModuleState(ModuleLevel initialLevel) {
-    this._moduleLevel = initialLevel;
+  ModuleState(ModuleState source) {
+    this._moduleLevel = source._moduleLevel;
+  }
+  private ModuleState(ModuleLevel source) {
+    this._moduleLevel = source;
   }
 
   public boolean off() {
