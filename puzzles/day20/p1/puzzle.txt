@@ -105,5 +105,5 @@ Consult your module configuration; determine the number of low pulses and high p
 
 To begin, get your puzzle input.
 
-Answer: 
+Answer: 919383692
  

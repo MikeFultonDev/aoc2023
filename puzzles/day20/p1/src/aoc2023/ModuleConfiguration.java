@@ -47,12 +47,14 @@ class ModuleConfiguration {
     if (pulses.isEmpty()) {
       return;
     }
-    for (Pulse pulse : pulses) {
-      System.out.println("Pulse source " + pulse.source() + "->" + pulse.targets());
-    }
    
     List<Pulse> cumulativePulses = new ArrayList<Pulse>();
     for (Pulse pulse : pulses) {
+      if (pulse.low()) {
+        this._lowPulses += pulse.targets().size();
+      } else {
+        this._highPulses += pulse.targets().size();
+      }
       for (String target : pulse.targets()) {
         Module targetModule = _entriesMap.get(target);
         if (targetModule != null) {
@@ -64,12 +66,21 @@ class ModuleConfiguration {
     processPulses(cumulativePulses);
   }
 
-  void run() {
-    Module buttonModule = _entriesMap.get("button");
-    List<Pulse> pulses = buttonModule.processPulse(null);
-    processPulses(pulses);
+  Long run(int iterations) {
+    this._lowPulses = 0L;
+    this._highPulses = 0L;
+    for (int i=0; i<iterations; ++i) {
+      Module buttonModule = _entriesMap.get("button");
+      List<Pulse> pulses = buttonModule.processPulse(null);
+      processPulses(pulses);
+    }
+
+    System.out.println("Processed " + this._lowPulses + " low pulses, and " + this._highPulses + " high pulses");
+    return this._lowPulses * this._highPulses;
   }
 
   private List<Module> _entriesList;
   private Map<String, Module> _entriesMap;
+  private Long _lowPulses;
+  private Long _highPulses;
 }

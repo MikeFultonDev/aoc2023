@@ -45,7 +45,7 @@ class Main {
     ModuleConfiguration moduleConfiguration = new ModuleConfiguration(configLines);
 
     System.out.println(moduleConfiguration);
-    moduleConfiguration.run();
+    this._tot = moduleConfiguration.run(1000);
     
     return false;
   }
