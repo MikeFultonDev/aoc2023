@@ -4,21 +4,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Pulse {
-  Pulse(String sourceName, List<String> targetNames, PulseState pulseState) {
-    this._sourceName = sourceName;
-    this._targetNames = targetNames;
-    this._pulseState = pulseState;
+  Pulse(String source, List<String> targets, PulseState state) {
+    this._source = source;
+    this._targets = targets;
+    this._state = state;
   }
 
-  public boolean low() {
-    return (_pulseState == PulseState.Low);
+  boolean low() {
+    return _state.low();
   }
-  public boolean high() {
-    return (_pulseState == PulseState.High);
+  boolean high() {
+    return _state.high();
   }
-  private String _sourceName;
-  private List<String> _targetNames;
-  private PulseState _pulseState;
-
-  public enum PulseState { Low, High };
+  String source() {
+    return _source;
+  }
+  List<String> targets() {
+    return _targets;
+  }
+  PulseState state() {
+    return _state;
+  }
+  private String _source;
+  private List<String> _targets;
+  private PulseState _state;
 }

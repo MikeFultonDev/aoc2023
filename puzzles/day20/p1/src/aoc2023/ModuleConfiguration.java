@@ -16,6 +16,20 @@ class ModuleConfiguration {
       ModuleConfigurationEntry entry = new ModuleConfigurationEntry(line, this._entriesMap);
       this._entriesList.add(entry.getModule());
     }
+
+    //
+    // Establish the input lists for the conjunction modules
+    //
+    for (String source : _entriesMap.keySet()) {
+      Module sourceModule = _entriesMap.get(source);
+      for (String target : sourceModule.targetNames()) {
+        Module targetModule = _entriesMap.get(target);
+        if (targetModule instanceof ConjunctionModule) {
+          ConjunctionModule cmod = (ConjunctionModule) targetModule;
+          cmod.addInput(source);
+        }
+      }
+    }
   }
 
   @Override

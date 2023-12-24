@@ -6,7 +6,7 @@ import java.util.List;
 class FlipFlopModule extends Module {
   FlipFlopModule(String name, List<String> targetNames) {
     super(name, targetNames);
-    _pulseState = Pulse.PulseState.Low;
+    _moduleState.setOff();
   }
   @Override
   public String prefix() {
@@ -14,14 +14,17 @@ class FlipFlopModule extends Module {
   }
 
   @Override
-  public List<String> processPulse(Pulse source) {
+  public List<Pulse> processPulse(Pulse source) {
     if (source.low()) {
-      flip(_pulseState);
-      return new Pulse(this.name(), this.targetNames(), _pulseState);
+      _moduleState.flip();
+      List<Pulse> pulses = new ArrayList<Pulse>();
+      PulseState out = (_moduleState.on()) ? PulseState.HIGH : PulseState.LOW;
+      pulses.add(new Pulse(this.name(), this.targetNames(), out));
+      return pulses;
     } else {
-      return EMPTY_TARGET_LIST;
+      return EMPTY_PULSE_LIST;
     }
   }
 
-  private Pulse.PulseState _pulseState;
+  private ModuleState _moduleState;
 }

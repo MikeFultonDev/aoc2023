@@ -41,7 +41,7 @@ abstract class Module {
   }
 
   abstract public String prefix();
-  abstract public List<String> processPulse(Pulse source);
+  abstract public List<Pulse> processPulse(Pulse source);
 
   @Override
   public String toString() {
@@ -64,5 +64,5 @@ abstract class Module {
   private List<String> _targetNames;
   private Map<String, Module> _entries;
 
-  protected final static List<String> EMPTY_TARGET_LIST = new ArrayList<String>();
+  protected final static List<Pulse> EMPTY_PULSE_LIST = new ArrayList<Pulse>();
 }
