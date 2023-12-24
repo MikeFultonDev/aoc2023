@@ -44,16 +44,21 @@ class ModuleConfiguration {
   }
 
   private void processPulses(List<Pulse> pulses) {
+    if (pulses.isEmpty()) {
+      return;
+    }
     for (Pulse pulse : pulses) {
       System.out.println("Pulse source " + pulse.source() + "->" + pulse.targets());
     }
-    
+   
+    List<Pulse> cumulativePulses = new ArrayList<Pulse>();
     for (Pulse pulse : pulses) {
       for (String target : pulse.targets()) {
         List<Pulse> targetPulses = _entriesMap.get(target).processPulse(pulse);
-        processPulses(targetPulses);
+        cumulativePulses.addAll(targetPulses);
       }
     }
+    processPulses(cumulativePulses);
   }
 
   void run() {
