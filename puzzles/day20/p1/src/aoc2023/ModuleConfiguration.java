@@ -54,8 +54,11 @@ class ModuleConfiguration {
     List<Pulse> cumulativePulses = new ArrayList<Pulse>();
     for (Pulse pulse : pulses) {
       for (String target : pulse.targets()) {
-        List<Pulse> targetPulses = _entriesMap.get(target).processPulse(pulse);
-        cumulativePulses.addAll(targetPulses);
+        Module targetModule = _entriesMap.get(target);
+        if (targetModule != null) {
+          List<Pulse> targetPulses = _entriesMap.get(target).processPulse(pulse);
+          cumulativePulses.addAll(targetPulses);
+        }
       }
     }
     processPulses(cumulativePulses);
