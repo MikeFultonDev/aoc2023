@@ -45,6 +45,11 @@ class Main {
     }
     PlotMap plotMap = new PlotMap(plotLines); 
     System.out.println(plotMap);
+    plotMap.walkNSteps(this._steps);
+    System.out.println(plotMap);
+
+    this._tot = plotMap.countSteps();
+
     return false;
   }
 
