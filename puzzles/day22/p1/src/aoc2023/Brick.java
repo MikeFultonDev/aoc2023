@@ -76,6 +76,58 @@ class Brick implements Comparable<Brick> {
     System.out.println("Drop brick by: " + drop + ". Adjust brick from: " + before + " to: " + after);
   }
 
+  boolean fillsCell(int cx, int cy, int cz) {
+    for (int x=min(BrickDimension.X); x<=max(BrickDimension.X); ++x) {
+      for (int y=min(BrickDimension.Y); y<=max(BrickDimension.Y); ++y) {
+        for (int z=min(BrickDimension.Z); z<=max(BrickDimension.Z); ++z) {
+          if (x == cx && y == cy && z == cz) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  boolean multipleSupports(RectangularSolid rs) {
+    int supports = 0;
+    for (int x=min(BrickDimension.X); x<=max(BrickDimension.X); ++x) {
+      for (int y=min(BrickDimension.Y); y<=max(BrickDimension.Y); ++y) {
+        int z=min(BrickDimension.Z); 
+        if (!rs.clear(x,y,z-1)) {
+          supports++;
+          if (supports > 1) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  boolean safeToDisintegrate(RectangularSolid rs, BrickMap brickMap) {
+    for (int x=min(BrickDimension.X); x<=max(BrickDimension.X); ++x) {
+      for (int y=min(BrickDimension.Y); y<=max(BrickDimension.Y); ++y) {
+        int z=max(BrickDimension.Z); 
+        int cellAbove = z+1;
+        if (!rs.clear(x,y,cellAbove)) {
+          Brick supportedBrick = brickMap.findBrick(x,y,cellAbove);
+          if (supportedBrick == null) {
+            // No bricks on top of it, but then the cell should be clear
+            throw new RuntimeException(this + " brick appears to have a brick on it at: [ " + x + "," + y + "," + cellAbove + "] but does not");
+          }
+
+          if (!supportedBrick.multipleSupports(rs)) {
+            System.out.println(this + " brick can not be disintegrated - it supports a brick with only 1 support");
+            return false;
+          }
+        }
+      }
+    }
+    System.out.println(this + " brick CAN be disintegrated - it only supports bricks with 2 or more supports");
+    return true;
+  }
+
   private boolean brickFootprintClear(RectangularSolid rs, int z) {
     for (int x=min(BrickDimension.X); x<=max(BrickDimension.X); ++x) {
       for (int y=min(BrickDimension.Y); y<=max(BrickDimension.Y); ++y) {

@@ -19,7 +19,16 @@ class BrickMap {
     }
     return out;
   }
-  
+ 
+  Brick findBrick(int cx, int cy, int cz) {
+    for (Brick brick: this._bricks) {
+      if (brick.fillsCell(cx, cy, cz)) {
+        return brick;
+      }
+    }
+    return null;
+  }
+
   void adjustZCoordinate() {
     System.out.println("sorted by Z");
     System.out.println(this.toString());
@@ -37,8 +46,15 @@ class BrickMap {
     Collections.sort(this._bricks);
     this._rectangularSolid = new RectangularSolid(this._bricks);
     adjustZCoordinate();
-    return 0;
+    for (Brick brick: this._bricks) {
+      // For each brick, see if it can be removed. If so, increment count by 1
+      if (brick.safeToDisintegrate(this._rectangularSolid, this)) {
+        this._safeToDisintegrate++;
+      }
+    }
+    return this._safeToDisintegrate;
   }
   private List<Brick> _bricks;
   private RectangularSolid _rectangularSolid;
+  private int _safeToDisintegrate;
 }

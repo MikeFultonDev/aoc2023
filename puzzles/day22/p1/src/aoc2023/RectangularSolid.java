@@ -16,12 +16,10 @@ class RectangularSolid {
 
   boolean clear(int x, int y, int z) {
     boolean val = this._rectangularSolid[x][y][z];
-    System.out.println("[" + x + "][" + y + "][" + z + "] is: " + val);
     return val == false;
   }
 
   void fill(int x, int y, int z) {
-    System.out.println("Set [" + x + "][" + y + "][" + z + "]");
     this._rectangularSolid[x][y][z] = true;
   }
 
