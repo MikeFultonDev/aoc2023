@@ -43,10 +43,8 @@ class Brick implements Comparable<Brick> {
     }
     this._startCoords = new BrickCoord(nums[0], nums[1], nums[2]);
     this._endCoords = new BrickCoord(nums[3], nums[4], nums[5]);
+    this._safeToDisintegrate = false;
   }
-
-  private BrickCoord _startCoords;
-  private BrickCoord _endCoords;
 
   int min(BrickDimension dim) {
     return BrickCoord.min(_startCoords, _endCoords, dim);
@@ -72,8 +70,6 @@ class Brick implements Comparable<Brick> {
     this._startCoords.dropZ(drop);
     this._endCoords.dropZ(drop);
     String after = toString();
-
-    System.out.println("Drop brick by: " + drop + ". Adjust brick from: " + before + " to: " + after);
   }
 
   boolean fillsCell(int cx, int cy, int cz) {
@@ -118,14 +114,13 @@ class Brick implements Comparable<Brick> {
           }
 
           if (!supportedBrick.multipleSupports(rs)) {
-            System.out.println(this + " brick can not be disintegrated - it supports a brick with only 1 support");
             return false;
           }
         }
       }
     }
-    System.out.println(this + " brick CAN be disintegrated - it only supports bricks with 2 or more supports");
-    return true;
+    this._safeToDisintegrate = true;
+    return this._safeToDisintegrate;
   }
 
   private boolean brickFootprintClear(RectangularSolid rs, int z) {
@@ -168,6 +163,16 @@ class Brick implements Comparable<Brick> {
     if (lenX == 1 && lenY == 1 && lenZ == 1) {
       out = out + " 1x1x1 cube";
     }
+    if (this._safeToDisintegrate) {
+      out = out + " (safe to disintegrate)";
+    } else {
+      out = out + " (CAN NOT be safely disintegrated)";
+    }
     return out;
   }
+
+  private BrickCoord _startCoords;
+  private BrickCoord _endCoords;
+  private boolean _safeToDisintegrate;
+
 }

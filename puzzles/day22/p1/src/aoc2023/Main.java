@@ -42,7 +42,6 @@ class Main {
       }
     }
     BrickMap brickMap = new BrickMap(brickLines); 
-    System.out.println(brickMap);
 
     this._safeToDisintegrate = brickMap.safeToDisintegrate();
 
