@@ -33,8 +33,74 @@ class Trailmap {
     this._trailmap[coord.x()][coord.y()] = cell;
   }
 
+  boolean canHead(TrailCoord newLocation, TrailDirection direction) {
+    TrailCell cell = this._trailmap[newLocation.x()][newLocation.y()];
+    if (cell == TrailCell.Forest || cell == TrailCell.End) { 
+      return true;
+    }
+    switch (direction) {
+      case North: 
+        return (cell == TrailCell.SlopeNorth);
+      case South:
+        return (cell == TrailCell.SlopeSouth);
+      case East:
+        return (cell == TrailCell.SlopeEast);
+      case West:
+        return (cell == TrailCell.SlopeWest);
+      default:
+        throw new RuntimeException("Unexpected direction");
+    }
+  }
+
+  int longestPath(TrailCoord location, int length) {
+    int curMax = 0;
+
+    if (location.equals(this._end)) {
+      return length;
+    }
+
+    # check location not seen yet
+
+    TrailCoord northLocation = new TrailCoord(location, TrailDirection.North);
+    TrailCoord southLocation = new TrailCoord(location, TrailDirection.South);
+    TrailCoord westLocation = new TrailCoord(location, TrailDirection.West);
+    TrailCoord eastLocation = new TrailCoord(location, TrailDirection.East);
+    if (canHead(northLocation, TrailDirection.North)) {
+      int northMax = longestPath(northLocation, length+1);
+      if (northMax > curMax) {
+        curMax = northMax;
+      }
+    }
+    if (canHead(southLocation, TrailDirection.South)) {
+      int southMax = longestPath(southLocation, length+1);
+      if (southMax > curMax) {
+        curMax = southMax;
+      }
+    }
+    if (canHead(westLocation, TrailDirection.West)) {
+      int westMax = longestPath(westLocation, length+1);
+      if (westMax > curMax) {
+        curMax = westMax;
+      }
+    }
+    if (canHead(eastLocation, TrailDirection.East)) {
+      int eastMax = longestPath(eastLocation, length+1);
+      if (eastMax > curMax) {
+        curMax = eastMax;
+      }
+    }
+
+    # mark location unseen
+
+    return curMax; 
+  }
+
   int longestPath() {
-    return 0;
+    // Walk from Start to End in all possible ways, and return the longest path
+    // Start out one step south of the start and then can avoid all range checks
+
+    int length = 1;
+    return longestPath(new TrailCoord(this._start, TrailDirection.South), length);
   }
 
   @Override 

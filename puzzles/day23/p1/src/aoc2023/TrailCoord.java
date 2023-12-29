@@ -5,6 +5,36 @@ class TrailCoord {
     this._x = x;
     this._y = y;
   }
+  TrailCoord(TrailCoord orig, TrailDirection direction) {
+    this._x = orig.x();
+    this._y = orig.y();
+    switch(direction) {
+      case North: 
+        --this._y; 
+        break;
+      case South: 
+        ++this._y;
+        break;
+      case West:  
+        --this._x;
+        break;
+      case East:  
+        ++this._x;
+        break;
+      default: 
+        throw new RuntimeException("Internal Error. Unknown direction");
+    }
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof TrailCoord) {
+      TrailCoord rhs = (TrailCoord) obj;
+      return this._x == rhs._x && this._y == rhs._y;
+    } else {
+      return false;
+    }
+  }
 
   int x() {
     return this._x;
