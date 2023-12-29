@@ -85,14 +85,17 @@ class Brick implements Comparable<Brick> {
     return false;
   }
 
-  boolean multipleSupports(RectangularSolid rs) {
-    int supports = 0;
+  boolean multipleSupports(RectangularSolid rs, BrickMap brickMap) {
+    Brick firstSupport = null;
     for (int x=min(BrickDimension.X); x<=max(BrickDimension.X); ++x) {
       for (int y=min(BrickDimension.Y); y<=max(BrickDimension.Y); ++y) {
         int z=min(BrickDimension.Z); 
         if (!rs.clear(x,y,z-1)) {
-          supports++;
-          if (supports > 1) {
+          // Make sure the brick you find is not the same as the first one
+          Brick support = brickMap.findBrick(x,y,z-1);
+          if (firstSupport == null) {
+            firstSupport = support;
+          } else if (support != firstSupport) {
             return true;
           }
         }
@@ -113,7 +116,7 @@ class Brick implements Comparable<Brick> {
             throw new RuntimeException(this + " brick appears to have a brick on it at: [ " + x + "," + y + "," + cellAbove + "] but does not");
           }
 
-          if (!supportedBrick.multipleSupports(rs)) {
+          if (!supportedBrick.multipleSupports(rs, brickMap)) {
             return false;
           }
         }
