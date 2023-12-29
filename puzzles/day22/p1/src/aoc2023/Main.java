@@ -9,56 +9,51 @@ import java.util.HashMap;
 
 class Main {
   public static void main(String args[]) throws java.io.IOException, NumberFormatException {
-    if (args.length != 2) {
-      System.out.printf("Syntax: java %s <steps> <plot>\n", Main.class.getName());
+    if (args.length != 1) {
+      System.out.printf("Syntax: java %s <bricks>\n", Main.class.getName());
       System.exit(4);
     }
 
-    String steps = args[0];
-    String plotFile = args[1];
+    String bricksFile = args[0];
 
-    System.out.printf("Processing %s\n", plotFile);
+    System.out.printf("Processing %s\n", bricksFile);
 
-    Main main = new Main(steps, plotFile); 
+    Main main = new Main(bricksFile); 
     if (main != null) {
-      if (!main.walk()) {
+      if (!main.disintegrate()) {
         main.printResult();
       }
     }
   }
 
-  Main(String steps, String plotFile) throws java.io.IOException, NumberFormatException {
-    this._steps = Integer.parseInt(steps);
-    this._plotFile = plotFile;
+  Main(String bricksFile) throws java.io.IOException {
+    this._bricksFile = bricksFile;
   }
 
-  private boolean walk() throws java.io.IOException {
-    List<String> plotLines = new ArrayList<String>();
+  private boolean disintegrate() throws java.io.IOException {
+    List<String> brickLines = new ArrayList<String>();
 
-    BufferedReader br = new BufferedReader(new FileReader(this._plotFile));
+    BufferedReader br = new BufferedReader(new FileReader(this._bricksFile));
     String l;
     while ((l = br.readLine()) != null) {
       String trimLine = l.trim();
       if (!trimLine.equals("")) {
-        plotLines.add(trimLine);
+        brickLines.add(trimLine);
       }
     }
-    PlotMap plotMap = new PlotMap(plotLines); 
-    System.out.println(plotMap);
-    plotMap.walkNSteps(this._steps);
-    System.out.println(plotMap);
+    BrickMap brickMap = new BrickMap(brickLines); 
+    System.out.println(brickMap);
 
-    this._tot = plotMap.countSteps();
+    this._safeToDisintegrate = brickMap.safeToDisintegrate();
 
     return false;
   }
 
   private void printResult() {
-    System.out.println("Number of plots in " + this._steps + " steps is: " + this._tot);
+    System.out.println(this._safeToDisintegrate + " bricks are safe to disintegrate");
   }
 
-  private int _steps;
-  private long _tot;
-  private String _plotFile;
+  private int _safeToDisintegrate;
+  private String _bricksFile;
 }
 
