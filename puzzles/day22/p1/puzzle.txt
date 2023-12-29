@@ -113,5 +113,5 @@ Figure how the blocks will settle based on the snapshot. Once they've settled, c
 
 To begin, get your puzzle input.
 
-Answer: 
+Answer:  (I am getting 711 which is too high)
  
