@@ -11,6 +11,7 @@ class Hailmap {
     }
   }
   int crossings(double startX, double startY, double endX, double endY) {
+    this._crossings = 0;
     for (HailVector hv1: _hailList) {
       for (HailVector hv2: _hailList) {
         if (hv1.parallelTo(hv2)) {
@@ -18,12 +19,17 @@ class Hailmap {
         }
         double x = (hv2.C() - hv1.C()) / (hv1.inclination() - hv2.inclination());
         if (x >= startX && x <= endX) {
-          System.out.println(hv1 + " and " + hv2 + " cross inside x range at: " + Double.toString(x));
+          double y = x * hv1.inclination() + hv1.C();
+          if (y >= startY && y <= endY) {
+            System.out.println(hv1 + " and " + hv2 + " cross inside x and y range at: " + Double.toString(x) + "," + Double.toString(y));
+            this._crossings++;
+          }
+
         }
       }
     }
     
-    return 0;
+    return this._crossings;
   }
 
   @Override
@@ -35,4 +41,5 @@ class Hailmap {
     return out;
   }
   private List<HailVector> _hailList;
+  private int _crossings;
 }
