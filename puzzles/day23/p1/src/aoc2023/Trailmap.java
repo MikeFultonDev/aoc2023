@@ -35,7 +35,10 @@ class Trailmap {
 
   boolean canHead(TrailCoord newLocation, TrailDirection direction) {
     TrailCell cell = this._trailmap[newLocation.x()][newLocation.y()];
-    if (cell == TrailCell.Forest || cell == TrailCell.End) { 
+    if (cell == TrailCell.Forest || cell == TrailCell.Start || cell == TrailCell.PathSeen) { 
+      return false;
+    }
+    if (cell == TrailCell.Path || cell == TrailCell.End) { 
       return true;
     }
     switch (direction) {
@@ -52,14 +55,38 @@ class Trailmap {
     }
   }
 
+  boolean isSeen(TrailCoord coord) {
+    TrailCell cell = this._trailmap[coord.x()][coord.y()];
+    return (cell == TrailCell.PathSeen || cell == TrailCell.Start);
+  }
+
+  void markSeen(TrailCoord coord) {
+    TrailCell cell = this._trailmap[coord.x()][coord.y()];
+    if (cell == TrailCell.Path) {
+      this._trailmap[coord.x()][coord.y()]= TrailCell.PathSeen;
+    }
+  }
+  void markUnseen(TrailCoord coord) {
+    TrailCell cell = this._trailmap[coord.x()][coord.y()];
+    if (cell == TrailCell.PathSeen) {
+      this._trailmap[coord.x()][coord.y()]= TrailCell.Path;
+    }
+  }
+
   int longestPath(TrailCoord location, int length) {
     int curMax = 0;
 
     if (location.equals(this._end)) {
+      System.out.println("Reached end in: " + length + " steps");
       return length;
     }
 
-    # check location not seen yet
+    if (isSeen(location)) {
+      return 0;
+    }
+    System.out.println("Coordinate: " + location);
+
+    markSeen(location);
 
     TrailCoord northLocation = new TrailCoord(location, TrailDirection.North);
     TrailCoord southLocation = new TrailCoord(location, TrailDirection.South);
@@ -90,7 +117,7 @@ class Trailmap {
       }
     }
 
-    # mark location unseen
+    markUnseen(location);
 
     return curMax; 
   }

@@ -36,6 +36,11 @@ class TrailCoord {
     }
   }
 
+  @Override
+  public String toString() {
+    return "[" + this._x + "," + this._y + "]";
+  }
+
   int x() {
     return this._x;
   }
