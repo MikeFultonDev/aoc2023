@@ -65,5 +65,5 @@ Find the longest hike you can take through the hiking trails listed on your map.
 
 To begin, get your puzzle input.
 
-Answer: 
+Answer: 2210
  
