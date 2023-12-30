@@ -26,6 +26,10 @@ class Main {
 
   Main(String hailmapFile) throws java.io.IOException {
     this._hailmapFile = hailmapFile;
+    this._startX = 7;
+    this._startY = 7;
+    this._endX = 27;
+    this._endY = 27;
   }
 
   private boolean track() throws java.io.IOException {
@@ -42,7 +46,7 @@ class Main {
     Hailmap hailMap = new Hailmap(hailLines); 
     System.out.println(hailMap);
 
-    this._crossings = hailMap.crossings();
+    this._crossings = hailMap.crossings(this._startX, this._startY, this._endX, this._endY);
 
     return false;
   }
@@ -53,5 +57,10 @@ class Main {
 
   private String _hailmapFile;
   private int _crossings;
+
+  private double _startX;
+  private double _startY;
+  private double _endX;
+  private double _endY;
 }
 

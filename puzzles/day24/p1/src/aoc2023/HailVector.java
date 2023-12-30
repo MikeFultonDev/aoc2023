@@ -1,7 +1,7 @@
 package aoc2023;
-import java.util.Reader;
-import java.util.StringReader;
-import java.util.StreamTokenizer;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StreamTokenizer;
 
 class HailVector {
   HailVector(String hailLine) throws java.io.IOException {
@@ -9,13 +9,25 @@ class HailVector {
     parse();
   }
 
+  public double inclination() {
+    return this._inclination;
+  }
+
+  public double C() {
+    return this._C;
+  }
+
+  public boolean parallelTo(HailVector other) {
+    return this._inclination == other._inclination;
+  }
+
   @Override
   public String toString() {
-    return "[" + this._startX + "," + this._startY + "] -> [" + this._dirX + "," + this._dirY + "]";
+    return "y = " + this._C + " + " + this._inclination + "x";
   }
 
   private void parse() throws java.io.IOException {
-    Reader r = new StringReader(this._workflowLine);
+    Reader r = new StringReader(this._hailLine);
     StreamTokenizer st = new StreamTokenizer(r);
     int token;
 
@@ -42,16 +54,17 @@ class HailVector {
       }
     }
 
-    this._startX = nums[0];
-    this._startY = nums[1];
-    this._dirX = nums[3];
-    this._dirY = nums[4];
+    double startX = nums[0];
+    double startY = nums[1];
+    double run = nums[3];
+    double rise = nums[4];
+
+    this._inclination = rise/run;
+    this._C = startY - this._inclination * startX;
   }
 
-  private double _startX;
-  private double _startY;
-  private double _dirX;
-  private double _dirY;
+  private double _inclination;
+  private double _C;
 
   String _hailLine;
 }
