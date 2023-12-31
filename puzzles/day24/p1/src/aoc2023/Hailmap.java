@@ -21,15 +21,18 @@ class Hailmap {
         if (x >= startX && x <= endX) {
           double y = x * hv1.inclination() + hv1.C();
           if (y >= startY && y <= endY) {
-            System.out.println(hv1 + " and " + hv2 + " cross inside x and y range at: " + Double.toString(x) + "," + Double.toString(y));
-            this._crossings++;
+            // Need to verify that this is now or in the future
+            if (hv1.before(x,y) && hv2.before(x,y)) {
+              System.out.println(hv1 + " and " + hv2 + " cross inside x and y range at: " + Double.toString(x) + "," + Double.toString(y));
+              this._crossings++;
+            }
           }
 
         }
       }
     }
     
-    return this._crossings;
+    return this._crossings/2;
   }
 
   @Override

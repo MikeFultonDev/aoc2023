@@ -52,7 +52,7 @@ class Main {
   }
 
   private void printResult() {
-    System.out.println("The longest path is: " + this._crossings + " steps");
+    System.out.println("There are: " + this._crossings + " crossings inside the range: [" + this._startX + "," + this._startY + "] -> [" + this._endX + "," + this._endY + "]" );
   }
 
   private String _hailmapFile;

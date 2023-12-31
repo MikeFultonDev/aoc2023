@@ -21,6 +21,42 @@ class HailVector {
     return this._inclination == other._inclination;
   }
 
+  public boolean before(double x, double y) {
+    // This point is _after_ the start point IF 
+    // x is AFTER the start and the run is positive
+    //   AND 
+    //     y is AFTER the start and the rise is positive
+    //       OR 
+    //     y is BEFORE the start and the rise is negative
+    //
+    // OR
+    // x is BEFORE the start and the run is negative
+    //   AND ...
+    //
+    if (x >= this._startX) {
+      if (this._run >= 0) {
+        if (y >= this._startY) {
+          if (this._rise >= 0) {
+            return true;
+          }
+        } else if (this._rise <= 0) {
+          return true;
+        }
+      }
+    } else if (x <= this._startX) {
+      if (this._run <= 0) {
+        if (y >= this._startY) {
+          if (this._rise >= 0) {
+            return true;
+          }
+        } else if (this._rise <= 0) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   @Override
   public String toString() {
     return "y = " + this._C + " + " + this._inclination + "x";
@@ -54,15 +90,21 @@ class HailVector {
       }
     }
 
-    double startX = nums[0];
-    double startY = nums[1];
+    this._startX = nums[0];
+    this._startY = nums[1];
     double run = nums[3];
     double rise = nums[4];
 
+    this._rise = rise;
+    this._run = run;
     this._inclination = rise/run;
-    this._C = startY - this._inclination * startX;
+    this._C = this._startY - this._inclination * this._startX;
   }
 
+  private double _startX;
+  private double _startY;
+  private double _rise;
+  private double _run;
   private double _inclination;
   private double _C;
 
