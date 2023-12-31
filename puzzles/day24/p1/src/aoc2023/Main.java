@@ -26,10 +26,10 @@ class Main {
 
   Main(String hailmapFile) throws java.io.IOException {
     this._hailmapFile = hailmapFile;
-    this._startX = 7;
-    this._startY = 7;
-    this._endX = 27;
-    this._endY = 27;
+    this._startX = 200000000000000L;
+    this._startY = 200000000000000L;
+    this._endX = 400000000000000L;
+    this._endY = 400000000000000L;
   }
 
   private boolean track() throws java.io.IOException {

@@ -23,7 +23,7 @@ class Hailmap {
           if (y >= startY && y <= endY) {
             // Need to verify that this is now or in the future
             if (hv1.before(x,y) && hv2.before(x,y)) {
-              System.out.println(hv1 + " and " + hv2 + " cross inside x and y range at: " + Double.toString(x) + "," + Double.toString(y));
+              //System.out.println(hv1 + " and " + hv2 + " cross inside x and y range at: " + Double.toString(x) + "," + Double.toString(y));
               this._crossings++;
             }
           }

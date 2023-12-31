@@ -67,5 +67,5 @@ Considering only the X and Y axes, check all pairs of hailstones' future paths f
 
 To begin, get your puzzle input.
 
-Answer: 
+Answer: 31921
  
