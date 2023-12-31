@@ -41,6 +41,14 @@ class WiringConnection {
     }
   }
 
+  String source() {
+    return this._source;
+  }
+
+  List<String> targets() {
+    return this._targets;
+  }
+
   @Override
   public String toString() {
     String out = this._source + " ->";
