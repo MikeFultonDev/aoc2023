@@ -3,8 +3,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 class WiringDiagram {
-  WiringDiagram(List<String> wiringLines) {
-    private this._wiringConnections = new ArrayList<WiringConnection>();
+  WiringDiagram(List<String> wiringLines) throws java.io.IOException {
+    this._wiringConnections = new ArrayList<WiringConnection>();
     for (String wiringLine : wiringLines) {
       _wiringConnections.add(new WiringConnection(wiringLine));
     }

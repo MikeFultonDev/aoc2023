@@ -1,4 +1,6 @@
 package aoc2023;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +51,6 @@ class Main {
   }
 
   private String _wiringDiagramFile;
-  private int _groupProduct;
+  private long _groupProduct;
 }
 
