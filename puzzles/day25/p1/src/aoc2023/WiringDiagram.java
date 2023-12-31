@@ -33,23 +33,48 @@ class WiringDiagram {
     }
   }
 
-  long groupProduct() {
-
-    // Add pairs to the list that differ in degree by 0 or 1
+  ConnectionPair mostConnected() {
+    // Add first pair to the list with highest degree of connectivity (hardcoded for 9x9)
+    // Could make general by finding highest degree of connectivity and working down until a connection
+    String mostConnected = null;
     for (WiringConnection connection: this._wiringConnections.values()) {
       String source = connection.source();
-      for (String target : connection.targets()) {
-        int sourceDegree = connection.targets().size();
-        int targetDegree = this._wiringConnections.get(target).targets().size();
-        int diff = targetDegree - sourceDegree;
-        if (diff < 0) {
-          diff = -diff;
-        }
-        if (diff <= 1) {
-          System.out.println("Pair to consider: [ " + source + "," + target + "]");
+      int sourceDegree = connection.targets().size();
+      if (sourceDegree == 9) {
+        //System.out.println("Connection to consider: " + connection);
+        for (String target : connection.targets()) {
+          int targetDegree = this._wiringConnections.get(target).targets().size();
+          if (targetDegree == sourceDegree) {
+            System.out.println("Consider pair with degrees " + sourceDegree + " and " + targetDegree + " [" + source + "," + target + "]");
+            return new ConnectionPair(source, target);
+          }
         }
       }
     }
+    return null;
+  }
+
+  List<List<String>> findPaths(WiringConnection source, String end, List<List<String>> paths) {
+    return null;
+  }
+
+  List<List<String>> findPaths(ConnectionPair connection) {
+    // Walk from connection nodeA to connection nodeB and 
+    // add each successful path to a list of lists
+    String start = connection._nodeA;
+    String end = connection._nodeB;
+    List<List<String>> paths = new List<List<String>>();
+
+    return findPaths(this._wiringConnections.get(start), end, paths);
+  }
+
+  long groupProduct() {
+
+    ConnectionPair mostConnected = mostConnected();
+    removeConnection(mostConnected);
+
+    List<List<String>> paths = findPaths(mostConnected);
+    System.out.println("There are " + paths.size() + " paths connecting " + mostConnected);
     return 0L;
   }
 
