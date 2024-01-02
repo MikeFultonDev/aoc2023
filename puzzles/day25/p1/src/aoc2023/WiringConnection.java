@@ -6,6 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 class WiringConnection {
+  WiringConnection(WiringNode source) {
+    this._source = new WiringNode(source.name());
+    this._targets = new ArrayList<WiringNode>();
+  }
+
   WiringConnection(String wiringLine) throws java.io.IOException {
     parse(wiringLine);
   }
@@ -20,7 +25,7 @@ class WiringConnection {
 
     this._source = null;
 
-    this._targets = new ArrayList<String>();
+    this._targets = new ArrayList<WiringNode>();
     while (true) {
       token = st.nextToken();
       if (token == StreamTokenizer.TT_EOF || st.ttype == ':') {
@@ -31,9 +36,9 @@ class WiringConnection {
         throw new java.io.IOException("Unexpected number: " + st.nval + " encountered");
       } else if (st.ttype == StreamTokenizer.TT_WORD) {
         if (this._source == null) {
-          this._source = st.sval;
+          this._source = new WiringNode(st.sval);
         } else {
-          this._targets.add(st.sval);
+          this._targets.add(new WiringNode(st.sval));
         }
       } else {
         throw new java.io.IOException("Unexpected token: " + st.ttype + " encountered");
@@ -41,23 +46,23 @@ class WiringConnection {
     }
   }
 
-  String source() {
+  WiringNode source() {
     return this._source;
   }
 
-  List<String> targets() {
+  List<WiringNode> targets() {
     return this._targets;
   }
 
   @Override
   public String toString() {
-    String out = this._source + " ->";
-    for (String target: this._targets) {
-      out = out + " " + target;
+    String out = this._source.name() + " ->";
+    for (WiringNode target: this._targets) {
+      out = out + " " + target.name();
     }
     return out;
   }
 
-  private String _source;
-  private List<String> _targets;
+  private WiringNode _source;
+  private List<WiringNode> _targets;
 }
