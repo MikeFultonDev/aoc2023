@@ -33,71 +33,132 @@ class WiringDiagram {
     }
   }
 
-  ConnectionPair mostConnected() {
-    // Add first pair to the list with highest degree of connectivity (hardcoded for 9x9)
-    // Could make general by finding highest degree of connectivity and working down until a connection
+  List<WiringNode> nodesOfDegreeN(int n) {
     WiringNode mostConnected = null;
+    List<WiringNode> degreeN = new ArrayList<WiringNode>();
+
+    for (WiringConnection connection: this._wiringConnections.values()) {
+      int sourceDegree = connection.targets().size();
+      if (sourceDegree == n) {
+        degreeN.add(connection.source());
+      }
+    }
+    return degreeN;
+  }
+
+  List<WiringNode> mostConnected() {
+    // Return list of sources with highest degree of connectivity
+    int maxDegree = 0;
+
+    List<WiringNode> mostConnected = null;
     for (WiringConnection connection: this._wiringConnections.values()) {
       WiringNode source = connection.source();
       int sourceDegree = connection.targets().size();
-      if (sourceDegree == 9) {
-        //System.out.println("Connection to consider: " + connection);
-        for (WiringNode target : connection.targets()) {
-          int targetDegree = this._wiringConnections.get(target).targets().size();
-          if (targetDegree == sourceDegree) {
-            System.out.println("Consider pair with degrees " + sourceDegree + " and " + targetDegree + " [" + source + "," + target + "]");
-            return new ConnectionPair(source, target);
-          }
-        }
+      if (sourceDegree > maxDegree) {
+        System.out.println("Max Degree: " + sourceDegree);
+        maxDegree = sourceDegree;
       }
     }
-    return null;
+    return nodesOfDegreeN(maxDegree);
   }
 
   void removeConnection(ConnectionPair pair) {
-    this._wiringConnections.get(pair._nodeA).targets().remove(pair._nodeB);
-    this._wiringConnections.get(pair._nodeB).targets().remove(pair._nodeA);
+//    System.out.println("remove: " + pair);
+    List<WiringNode> nodeATargets = this._wiringConnections.get(pair._nodeA).targets();
+    List<WiringNode> nodeBTargets = this._wiringConnections.get(pair._nodeB).targets();
+    if (!nodeATargets.remove(pair._nodeB)) {
+      throw new RuntimeException("Unable to find: " + pair._nodeB + " in: " + nodeATargets);
+    }
+    if (!nodeBTargets.remove(pair._nodeA)) {
+      throw new RuntimeException("Unable to find: " + pair._nodeB + " in: " + nodeATargets);
+    }
   }
 
-  void findPath(WiringConnection sourceConnection, WiringNode end, List<ArrayList<WiringNode>> paths, List<WiringNode> currentPath) {
+  void addConnection(ConnectionPair pair) {
+//    System.out.println("add: " + pair);
+    this._wiringConnections.get(pair._nodeA).targets().add(pair._nodeB);
+    this._wiringConnections.get(pair._nodeB).targets().add(pair._nodeA);
+  }
+
+  ArrayList<WiringNode> findPath(WiringConnection sourceConnection, WiringNode end, ArrayList<WiringNode> currentPath) {
     WiringNode source = sourceConnection.source();
-    if (source.equals(end)) {
-      currentPath.add(source);
-      return;
-    }
     if (source.touched()) {
-      return;
+      return null;
+    }
+    if (source.equals(end)) {
+      //System.out.println("Found Path: with " + currentPath.size() + " nodes");
+      ArrayList<WiringNode> clonedCurrentPath = new ArrayList<WiringNode>(currentPath);
+      return clonedCurrentPath;
     }
     source.touch();
 
+    ArrayList<WiringNode> fullPath = null;
     for (WiringNode next : sourceConnection.targets()) {
       if (!next.touched()) {
         WiringConnection nextConnection = this._wiringConnections.get(next);
-        findPath(nextConnection, end, paths, currentPath);
+        ArrayList<WiringNode> nextPath;
+        if (currentPath != null) {
+          nextPath = new ArrayList<WiringNode>(currentPath);
+        } else {
+          nextPath = new ArrayList<WiringNode>();
+        }
+        nextPath.add(next);
+        //System.out.println(currentPath);
+        if ((fullPath = findPath(nextConnection, end, nextPath)) != null) {
+          break;
+        }
       }
     }
+
     source.clear();
+    return fullPath;
   }
 
-  List<ArrayList<WiringNode>> findPaths(ConnectionPair connection) {
+  List<WiringNode> findPaths(ConnectionPair connection) {
     // Walk from connection nodeA to connection nodeB and 
     // add each successful path to a list of lists
     WiringNode start = connection._nodeA;
     WiringNode end = connection._nodeB;
     List<ArrayList<WiringNode>> paths = new ArrayList<ArrayList<WiringNode>>();
 
-    List<WiringNode> currentPath = new ArrayList<WiringNode>();
-    findPath(this._wiringConnections.get(start), end, paths, currentPath);
-    return paths;
+    ArrayList<WiringNode> currentPath = null;
+    return findPath(this._wiringConnections.get(start), end, currentPath);
   }
 
   long groupProduct() {
+    List<ConnectionPair> pairs = new ArrayList<ConnectionPair>();
+    for (WiringConnection connection: this._wiringConnections.values()) {
+      WiringNode source = connection.source();
+      for (WiringNode target : connection.targets()) {
+        ConnectionPair pair = new ConnectionPair(source, target);
+        pairs.add(pair);
+      }
+    }
 
-    ConnectionPair mostConnected = mostConnected();
-    removeConnection(mostConnected);
+    for (ConnectionPair first : pairs) {
+      removeConnection(first);
+      for (ConnectionPair second : pairs) {
+        if (first.equals(second)) continue;
+        removeConnection(second);
+        for (ConnectionPair third : pairs) {
+          if (first.equals(third)) continue;
+          if (second.equals(third)) continue;
+          removeConnection(third);
 
-    List<ArrayList<WiringNode>> paths = findPaths(mostConnected);
-    System.out.println("There are " + paths.size() + " paths connecting " + mostConnected);
+          List<WiringNode> path = findPaths(first);
+          if (path == null) {
+            System.out.println("NO Path exists for: " + first + " after removing: " + second + " and " + third);
+            return 1L;
+          } else {
+            ;
+          }
+          addConnection(third);
+        }
+        addConnection(second);
+      }
+      addConnection(first);
+    }
+        
     return 0L;
   }
 

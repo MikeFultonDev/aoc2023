@@ -15,6 +15,16 @@ class WiringNode {
     return this._name.equals(rhs._name);
   }
 
+  @Override
+  public String toString() {
+    return this._name + ((this._touched) ? " (touched)" : "");
+  }
+
+  @Override 
+  public int hashCode() {
+    return this._name.hashCode();
+  }
+
   void touch() {
     this._touched = true;
   }
