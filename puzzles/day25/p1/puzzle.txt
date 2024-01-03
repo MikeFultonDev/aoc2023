@@ -46,4 +46,4 @@ Find the three wires you need to disconnect in order to divide the components in
 
 To begin, get your puzzle input.
 
-Answer:
+Answer: 596376 (792 * 753)
