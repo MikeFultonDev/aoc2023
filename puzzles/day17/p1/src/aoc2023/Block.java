@@ -20,36 +20,35 @@ class Block {
     int currentPathSize = currentPath.size();
     int excludeDirection = BlockDirectionNone;
     if (currentPathSize >= 3) {
-      int prevDirection = Block.direction(currentPath, currentPathSize-1, currentPathSize-2);
-      int prevPrevDirection = Block.direction(currentPath, currentPathSize-2, currentPathSize-3);
-
+      int prevDirection = Block.direction(currentPath, currentPathSize-2, currentPathSize-1);
+      int prevPrevDirection = Block.direction(currentPath, currentPathSize-3, currentPathSize-2);
       if (prevDirection == prevPrevDirection) {
         excludeDirection = prevDirection;
       }
     }
-    if (_blockCoord.isMinX(blockDiagram)) {
+    if (_blockCoord.isMinY(blockDiagram)) {
       excludeDirection |= BlockDirectionUp;
-    } else if (_blockCoord.isMaxX(blockDiagram)) {
+    } else if (_blockCoord.isMaxY(blockDiagram)) {
       excludeDirection |= BlockDirectionDown;
     }
-    if (_blockCoord.isMinY(blockDiagram)) {
+    if (_blockCoord.isMinX(blockDiagram)) {
       excludeDirection |= BlockDirectionLeft;
-    } else if (_blockCoord.isMaxY(blockDiagram)) {
+    } else if (_blockCoord.isMaxX(blockDiagram)) {
       excludeDirection |= BlockDirectionRight;
     }
 
     List<Block> nextBlock = new ArrayList<Block>();
-    if ((excludeDirection & BlockDirectionUp) == 0) {
-      nextBlock.add(up(blockDiagram));
-    }
     if ((excludeDirection & BlockDirectionDown) == 0) {
       nextBlock.add(down(blockDiagram));
     }
-    if ((excludeDirection & BlockDirectionLeft) == 0) {
-      nextBlock.add(left(blockDiagram));
-    }
     if ((excludeDirection & BlockDirectionRight) == 0) {
       nextBlock.add(right(blockDiagram));
+    }
+    if ((excludeDirection & BlockDirectionUp) == 0) {
+      nextBlock.add(up(blockDiagram));
+    }
+    if ((excludeDirection & BlockDirectionLeft) == 0) {
+      nextBlock.add(left(blockDiagram));
     }
     return nextBlock;
   }
@@ -62,6 +61,10 @@ class Block {
   }
   void touch() {
     _touched = true;
+  }
+
+  int cost() {
+    return (int) (this._c - '0');
   }
 
   private Block up(BlockDiagram blockDiagram) {

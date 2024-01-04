@@ -28,13 +28,20 @@ class BlockDiagram {
 
     this._startBlock = this._blockMap[this.minX()][this.minY()];
     this._endBlock = this._blockMap[this.maxX()-1][this.maxY()-1];
+    this._shortest = this.maxX() * this.maxY();
   }
 
+  // Need to recode using Dijstra's algorithm: https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
   List<Block> findShortestPath(Block source, Block end, List<Block> currentPath) {
     if (source.touched()) {
       return null;
     }
     if (source.equals(end)) {
+      int currentCost = cost(currentPath);
+      if (currentCost < this._shortest) {
+        System.out.println("Found path of length: " + currentCost + " " + currentPath);
+        this._shortest = currentCost;
+      }
       List<Block> clonedCurrentPath = new ArrayList<Block>(currentPath);
       return clonedCurrentPath;
     }
@@ -63,6 +70,11 @@ class BlockDiagram {
     return findShortestPath(this._startBlock, this._endBlock, currentPath);
   }
 
+  long minimalHeatLoss() {
+    findShortestPath();
+    return this._shortest;
+  }
+
   Block[][] blockMap() {
     return this._blockMap;
   }
@@ -83,14 +95,18 @@ class BlockDiagram {
   int maxX() { return this._maxX; }
   int maxY() { return this._maxY; }
 
-  long minimalHeatLoss() {
-    return 0L;
+  private int cost(List<Block> path) {
+    int tot=0;
+    for (Block block : path) {
+      tot += block.cost();
+    }
+    return tot;
   }
-
   private int _minX;
   private int _maxX;
   private int _minY;
   private int _maxY;
+  private int _shortest;
 
   private Block _startBlock;
   private Block _endBlock;
