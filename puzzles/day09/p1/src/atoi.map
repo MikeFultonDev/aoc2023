@@ -1,0 +1,201 @@
+1z/OS V2 R4 BINDER     21:24:59 THURSDAY JANUARY  4, 2024                                                                
+ BATCH EMULATOR  JOB(FULTONM5) STEP(*OMVSEX ) PGM= *PATHNAM                                                              
+ IEW2278I B352 INVOCATION PARAMETERS -                                                                                   
+          TERM=YES,PRINT=NO,MSGLEVEL=4,STORENX=NEVER,LIST=NOIMP,XREF=YES,MAP=YES,PRINT=YES,MSGLEVEL=0                    
+ IEW2322I 1220  1    INCLUDE  './main.o'                                                                                 
+ IEW2322I 1220  2    INCLUDE  './wrtmsg.o'                                                                               
+ IEW2322I 1220  3    INCLUDE  './fns.o'                                                                                  
+ IEW2650I 5102 MODULE ENTRY NOT PROVIDED.  ENTRY DEFAULTS TO SECTION MAIN.                                               
+                                                                                                                         
+1                         *** M O D U L E  M A P ***                                                                     
+                                                                                                                         
+ ---------------                                                                                                         
+ CLASS  B_TEXT            LENGTH =      23A  ATTRIBUTES = CAT,   LOAD, RMODE=ANY                                         
+                          OFFSET =        0 IN SEGMENT 001     ALIGN = DBLWORD                                           
+ ---------------                                                                                                         
+                                                                                                                         
+  SECTION    CLASS                                      ------- SOURCE --------                                          
+   OFFSET   OFFSET  NAME                TYPE    LENGTH  DDNAME   SEQ  MEMBER                                             
+                                                                                                                         
+                 0  MAIN               CSECT        84  /0000001  01                                                     
+                                                                                                                         
+                88  WRTMSG             CSECT       11E  /0000002  01                                                     
+                                                                                                                         
+               1A8  ATOI               CSECT        7A  /0000003  01                                                     
+                                                                                                                         
+               228  BPX1WRT         *  CSECT        12  SYSLIB    01  BPX1WRT                                            
+1          ***  DATA SET SUMMARY  ***                                                                                    
+                                                                                                                         
+ DDNAME    CONCAT   FILE IDENTIFICATION                                                                                  
+                                                                                                                         
+ /0000001    01     ./main.o                                                                                             
+ /0000002    01     ./wrtmsg.o                                                                                           
+ /0000003    01     ./fns.o                                                                                              
+ SYSLIB      01     SYS1.CSSLIB                                                                                          
+                                                                                                                         
+           *** E N D  O F  M O D U L E  M A P ***                                                                        
+                                                                                                                         
+                                                                                                                         
+1                                       C R O S S - R E F E R E N C E  T A B L E                                         
+                                        _________________________________________                                        
+                                                                                                                         
+ TEXT CLASS = B_TEXT                                                                                                     
+                                                                                                                         
+ ---------------  R E F E R E N C E  --------------------------  T A R G E T  -------------------------------------------
+   CLASS                            ELEMENT       |                                            ELEMENT                  |
+   OFFSET SECT/PART(ABBREV)          OFFSET  TYPE | SYMBOL(ABBREV)   SECTION (ABBREV)           OFFSET CLASS NAME       |
+                                                  |                                                                     |
+       60 MAIN                           60 V-CON | ATOI             ATOI                            0 B_TEXT           |
+       64 MAIN                           64 V-CON | WRTMSG           WRTMSG                          0 B_TEXT           |
+       F0 WRTMSG                         68 V-CON | BPX1WRT          BPX1WRT                         0 B_TEXT           |
+      180 WRTMSG                         F8 V-CON | BPX1WRT          BPX1WRT                         0 B_TEXT           |
+                                        *** E N D  O F  C R O S S  R E F E R E N C E ***                                 
+                                                                                                                         
+                                                                                                                         
+                                                                                                                         
+                                 *** O P E R A T I O N   S U M M A R Y   R E P O R T ***                                 
+                                                                                                                         
+1PROCESSING OPTIONS:                                                                                                     
+                                                                                                                         
+    ALIASES             NO                                                                                               
+    ALIGN2              NO                                                                                               
+    AMODE               UNSPECIFIED                                                                                      
+    CALL                YES                                                                                              
+    CASE                UPPER                                                                                            
+    COMPAT              UNSPECIFIED                                                                                      
+    COMPRESS            AUTO                                                                                             
+    DCBS                NO                                                                                               
+    DYNAM               NO                                                                                               
+    EXTATTR             UNSPECIFIED                                                                                      
+    EXITS:              NONE                                                                                             
+    FILL                NONE                                                                                             
+    GID                 UNSPECIFIED                                                                                      
+    HOBSET              NO                                                                                               
+    INFO                NO                                                                                               
+    LET                 04                                                                                               
+    LINECT              060                                                                                              
+    LIST                NOIMP                                                                                            
+    LISTPRIV            NO                                                                                               
+    LONGPARM            NO                                                                                               
+    MAP                 YES                                                                                              
+    MAXBLK              032760                                                                                           
+    MODMAP              NO                                                                                               
+    MSGLEVEL            00                                                                                               
+    OVLY                NO                                                                                               
+    PRINT               YES                                                                                              
+    RES                 NO                                                                                               
+    REUSABILITY         UNSPECIFIED                                                                                      
+    RMODE               UNSPECIFIED                                                                                      
+    RMODEX              NO                                                                                               
+    SIGN                NO                                                                                               
+    STORENX             NEVER                                                                                            
+    STRIPCL             NO                                                                                               
+    STRIPSEC            NO                                                                                               
+    SYMTRACE                                                                                                             
+    TERM                YES                                                                                              
+    TRAP                ON                                                                                               
+    UID                 UNSPECIFIED                                                                                      
+    UPCASE              NO                                                                                               
+    WKSPACE             000000K,000000K                                                                                  
+    XCAL                NO                                                                                               
+    XREF                YES                                                                                              
+    ***END OF OPTIONS***                                                                                                 
+                                                                                                                         
+                                                                                                                         
+                                                                                                                         
+                                                                                                                         
+1SAVE OPERATION SUMMARY:                                                                                                 
+                                                                                                                         
+                                                                                                                         
+    PATH NAME           /home/fultonm/aoc2023/puzzles/day09/p1/src/atoi                                                  
+    PROGRAM TYPE        PROGRAM OBJECT(FORMAT 2)                                                                         
+    TIME OF SAVE        21.25.00  JAN  4, 2024                                                                           
+                                                                                                                         
+                                                                                                                         
+1SAVE MODULE ATTRIBUTES:                                                                                                 
+                                                                                                                         
+    AC                  000                                                                                              
+    AMODE                31                                                                                              
+    COMPRESSION         NONE                                                                                             
+    DC                  NO                                                                                               
+    EDITABLE            YES                                                                                              
+    EXCEEDS 16MB        NO                                                                                               
+    EXECUTABLE          YES                                                                                              
+    LONGPARM            NO                                                                                               
+    MIGRATABLE          YES                                                                                              
+    OL                  NO                                                                                               
+    OVLY                NO                                                                                               
+    PACK,PRIME          NO,NO                                                                                            
+    PAGE ALIGN          NO                                                                                               
+    REFR                NO                                                                                               
+    RENT                NO                                                                                               
+    REUS                NO                                                                                               
+    RMODE               ANY                                                                                              
+    SCTR                NO                                                                                               
+    SIGN                NO                                                                                               
+    SSI                                                                                                                  
+    SYM GENERATED       NO                                                                                               
+    TEST                NO                                                                                               
+    XPLINK              NO                                                                                               
+    MODULE SIZE (HEX)   00000240                                                                                         
+    DASD SIZE (HEX)     00002000                                                                                         
+                                                                                                                         
+                                                                                                                         
+1 ENTRY POINT AND ALIAS SUMMARY:                                                                                         
+                                                                                                                         
+  NAME:            ENTRY TYPE AMODE C_OFFSET CLASS NAME        STATUS                                                    
+                                                                                                                         
+  MAIN              MAIN_EP      31 00000000 B_TEXT                                                                      
+                                                                                                                         
+                          *** E N D   O F   O P E R A T I O N   S U M M A R Y   R E P O R T ***                          
+                                                                                                                         
+                                                                                                                         
+                                                                                                                         
+                                                                                                                         
+1z/OS V2 R4 BINDER     21:24:59 THURSDAY JANUARY  4, 2024                                                                
+ BATCH EMULATOR  JOB(FULTONM5) STEP(*OMVSEX ) PGM= *PATHNAM                                                              
+ IEW2008I 0F03 PROCESSING COMPLETED.  RETURN CODE =  0.                                                                  
+                                                                                                                         
+                                                                                                                         
+                                                                                                                         
+1++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++                                              
+ |   D D N A M E         C R O S S R E F E R E N C E                      |                                              
+ ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++                                              
+                                                                                                                         
+  DDNAME   MAPPED FROM                                                                                                   
+ --------  ----------------------------------------------------------------                                              
+                                                                                                                         
+ /0000001  ./main.o                                                                                                      
+                                                                                                                         
+ /0000002  ./wrtmsg.o                                                                                                    
+                                                                                                                         
+ /0000003  ./fns.o                                                                                                       
+                                                                                                                         
+                                                                                                                         
+                          *** END OF DDNAME CROSS REFERENCE ***                                                          
+                                                                                                                         
+                                                                                                                         
+                                                                                                                         
+                                                                                                                         
+                                                                                                                         
+1----------------------                                                                                                  
+ MESSAGE SUMMARY REPORT                                                                                                  
+ ----------------------                                                                                                  
+  TERMINAL MESSAGES      (SEVERITY = 16)                                                                                 
+  NONE                                                                                                                   
+                                                                                                                         
+  SEVERE MESSAGES        (SEVERITY = 12)                                                                                 
+  NONE                                                                                                                   
+                                                                                                                         
+  ERROR MESSAGES         (SEVERITY = 08)                                                                                 
+  NONE                                                                                                                   
+                                                                                                                         
+  WARNING MESSAGES       (SEVERITY = 04)                                                                                 
+  NONE                                                                                                                   
+                                                                                                                         
+  INFORMATIONAL MESSAGES (SEVERITY = 00)                                                                                 
+  2008  2278  2322  2650                                                                                                 
+                                                                                                                         
+                                                                                                                         
+  **** END OF MESSAGE SUMMARY REPORT ****                                                                                
+                                                                                                                         

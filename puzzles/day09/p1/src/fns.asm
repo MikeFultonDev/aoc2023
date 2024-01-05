@@ -1,7 +1,7 @@
         PRINT ON,GEN,DATA
-GETNM   CSECT
-GETNM   RMODE ANY
-GETNM   AMODE 31
+ATOI    CSECT
+ATOI    RMODE ANY
+ATOI    AMODE 31
 *
 * Prolog
 *
@@ -47,6 +47,7 @@ LOOP    DS 0H
         BH DONE
         SR R3,R7
         MSR R10,R6
+        ST 0,0
         AR R10,R3
         AR R4,R5
         B  LOOP

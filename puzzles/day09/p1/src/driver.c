@@ -1,6 +1,5 @@
-#pragma linkage(HELLO, OS)
-
+#pragma linkage(ATOI, OS)
+#include <stdio.h>
 int main() {
-  write(0, "Hello", 5);
-  HELLO();
+  printf("%d\n", ATOI("33"));
 }

@@ -1,0 +1,21 @@
+#!/bin/sh
+set -x
+if [ $# -lt 2 ]; then
+  echo "Syntax: testfn <assember source without extension> <parameter>" >&2
+  exit 4
+fi
+
+fn=$1
+as -mlist ${fn}.asm >${fn}.lst
+rc=$?
+if [ $rc -gt 2 ]; then
+  exit $rc
+fi
+
+ld -S "//'SYS1.CSSLIB'" -o${fn} ${fn}.o
+rc=$?
+if [ $rc -gt 0 ]; then
+  exit $rc
+fi
+${fn} $2
+echo $?
