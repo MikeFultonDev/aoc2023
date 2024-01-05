@@ -6,21 +6,22 @@ ATOI    AMODE 31
 * Prolog
 *
         SAVE (14,12)
-        BASR R15,0
-        USING *,R15
-        USING SAVEA,R13
-        LA R2,SAVEA
+        BASR R12,0
+        USING *,R12
+        LR R3,R1
+        STORAGE OBTAIN,LENGTH=DYNL,ADDR=(R11)
+        USING DYNAREA,R11
+        LR R1,R3
+        LA R2,DSA
         ST R2,8(,R13)
-        ST R13,SAVEA+4
+        ST R13,DSA+4
         LR R13,R2
 *
 * Convert the number in the string pointed to by R1 into a number
 *
-        LA R1,STRING
-*
 * R4: index
 * R1: string
-* R10/R11: result
+* R10: result
 * R3: character
 * R5: constant one
 * R6: constant ten
@@ -28,11 +29,10 @@ ATOI    AMODE 31
 * R8: constant '9'
 *
         XR R10,R10
-        XR R11,R11
         XR R3,R3
-        XR R4,R4
         XR R7,R7
         XR R8,R8
+        XR R4,R4
 
         L  R5,ONE
         L  R6,TEN
@@ -47,18 +47,19 @@ LOOP    DS 0H
         BH DONE
         SR R3,R7
         MSR R10,R6
-        ST 0,0
         AR R10,R3
         AR R4,R5
         B  LOOP
 
 DONE    DS 0H
-        LR R15,R10
-
+*
 * Epilog
 *
-        L   R13,SAVEA+4
+        L   R13,DSA+4
+        STORAGE RELEASE,LENGTH=DYNL,ADDR=(R11)
+        LR R15,R10
         RETURN (14,12),RC=(15)
+
         LTORG
 *
 * Statics (constants)
@@ -67,17 +68,16 @@ ZEROC   DC C'0'
 NINEC   DC C'9'
 ONE     DC F'1'
 TEN     DC F'10'
-STRING  DC C'12536 '
 
 *
 * Dynamic (storage obtain'ed) area
 *
 DYNAREA DSECT
-DYNSIZE EQU DYNEND-*
+DYNL    EQU DYNEND-*
 *
 * Stack save area always first
 *
-SAVEA   DS 18F
+DSA     DS 18F
 DYNEND  EQU *
 *
 * Equates

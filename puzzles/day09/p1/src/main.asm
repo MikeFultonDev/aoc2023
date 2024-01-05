@@ -14,8 +14,6 @@ MAIN    AMODE 31
 * Prolog
 *
         SAVE (14,12)
-        LR R7,R14
-        LR R8,R13
         BASR R12,0
         USING *,R12
         LR R3,R1
@@ -36,11 +34,11 @@ MAIN    AMODE 31
 
         L  R3,4(,R1)   # Argument length list
 
-        L  R9,4(,R3)   # Pointer to second parameter length
-        LA R10,4(,R9)  # Pointer to second parameter data
+        L  R9,4(,R3)   # Pointer to second parameter
+        LA R10,4(,R9)  # Pointer to second parameter text
+
 
 * Call ATOI
-        ST 0,0(,0)
         LR R1,R10
         L  R15,=V(ATOI)
         BASR R14,R15
