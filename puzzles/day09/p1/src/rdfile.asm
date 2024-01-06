@@ -40,12 +40,13 @@ RDFILE   AMODE 31
 * Store values into parameter list
 *
         USING PARMS,R1
+        LA  R3,STAT#LENGTH
+        ST  R3,STATL
         L   R10,PPATHL
         ST  R10,PATHLEN 
         L   R9,PPATHA
+        L   R9,0(,R9)
         ST  R9,PATHNAME
-        LA  R8,STAT#LENGTH
-        ST  R8,STATL
         XC  O_FLAGS(OPNF#LENGTH),O_FLAGS
         MVI O_FLAGS4,O_RDONLY
 
