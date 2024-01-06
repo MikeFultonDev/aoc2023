@@ -49,12 +49,6 @@ RDFILE   AMODE 31
         XC  O_FLAGS(OPNF#LENGTH),O_FLAGS
         MVI O_FLAGS4,O_RDONLY
 
-        L   R2,0(,R9)
-        L   R3,4(,R9)
-        L   R4,8(,R9)
-        L   R5,12(,R9)
-        L   R6,16(,R9)
-
         CALL  BPX2OPN,                                                 x
                (PATHLEN,                                               x
                PATHNAME,                                               x

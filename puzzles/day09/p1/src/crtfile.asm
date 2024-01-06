@@ -54,7 +54,6 @@ CRTFILE AMODE 31
         L     R4,RV
         L     R5,RC
         L     R6,RN
-        ST    0,0(,0)
         ICM   R10,B'1111',RV
         BL    OpenFail
         LR    R2,R10       # File Descriptor
@@ -108,8 +107,8 @@ RC      DS  F
 RN      DS  F
 
 BUFLENA  DS F
-BUFFERA  DS A
 STATL    DS F
+BUFFERA  DS CL13
 
 * openstat structures
 O_FLAGS  BPXYOPNF DSECT=NO
