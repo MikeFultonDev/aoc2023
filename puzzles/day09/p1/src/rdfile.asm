@@ -68,7 +68,7 @@ RDFILE   AMODE 31
 Epilog  DS    0H
         L     R13,DSA+4
         STORAGE RELEASE,LENGTH=DYNL,ADDR=(R11)
-        LR    R15,R10
+        LR    R15,R3
         RETURN (14,12),RC=(15)
 OpenFail DS 0H
          B  Epilog     # R10 has -1 (failed OPEN) for Return Value
@@ -114,7 +114,6 @@ RC      DS  F
 RN      DS  F
 
 PATHLEN  DS F
-PATHNAME DS CL(1024)
 STATL    DS F
 
 * openstat structures
