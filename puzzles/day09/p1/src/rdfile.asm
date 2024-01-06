@@ -45,7 +45,6 @@ RDFILE   AMODE 31
         L   R10,PPATHL
         ST  R10,PATHLEN 
         L   R9,PPATHA
-        L   R9,0(,R9)
         ST  R9,PATHNAME
         XC  O_FLAGS(OPNF#LENGTH),O_FLAGS
         MVI O_FLAGS4,O_RDONLY
