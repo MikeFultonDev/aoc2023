@@ -40,13 +40,13 @@ MAIN    AMODE 31
         LA R10,4(,R9)  # Pointer to second parameter text
         ST R10,FileName
 
-        LHI R2,2
-        STH R2,FD
-        STH R8,Len
-        MVC Txt(80),0(R10)
-        LA R1,Msg
-        L  R15,=V(WRTMSG)
-        BASR R14,R15
+*       LHI R2,2
+*       STH R2,FD
+*       STH R8,Len
+*       MVC Txt(80),0(R10)
+*       LA R1,Msg
+*       L  R15,=V(WRTMSG)
+*       BASR R14,R15
 
         LA R0,0
         ST R0,Buffer
@@ -96,10 +96,10 @@ FileNameLength DS F
 FileName       DS A
 Buffer         DS A
 
-Msg            DS 0H
-FD             DS H
-Len            DS H
-Txt            DS CL80
+*Msg            DS 0H
+*FD             DS H
+*Len            DS H
+*Txt            DS CL80
 
 DYNEND  EQU *
 *

@@ -45,13 +45,12 @@ RDFILE   AMODE 31
         L   R10,PPATHL
         ST  R10,PATHLEN 
         L   R9,PPATHA
-        MVC PATHNAME(18),0(R9)
         XC  O_FLAGS(OPNF#LENGTH),O_FLAGS
         MVI O_FLAGS4,O_RDONLY
 
         CALL  BPX2OPN,                                                 x
                (PATHLEN,                                               x
-               PATHNAME,                                               x
+               (R9),                                                   x
                O_FLAGS,                                                x
                S_MODE,                                                 x
                STATL,                                                  x
