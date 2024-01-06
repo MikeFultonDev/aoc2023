@@ -40,25 +40,36 @@ RDFILE   AMODE 31
 * Store values into parameter list
 *
         USING PARMS,R1
-
-        LA  R9,PPATHL
-        ST  R9,PATHLENA
+        L   R10,PPATHL
+        ST  R10,PATHLEN 
         L   R9,PPATHA
         ST  R9,PATHNAME
-        XC  S_MODE,S_MODE
+        LA  R8,STAT#LENGTH
+        ST  R8,STATL
         XC  O_FLAGS(OPNF#LENGTH),O_FLAGS
         MVI O_FLAGS4,O_RDONLY
 
+        L   R2,0(,R9)
+        L   R3,4(,R9)
+        L   R4,8(,R9)
+        L   R5,12(,R9)
+        L   R6,16(,R9)
+
         CALL  BPX2OPN,                                                 x
-               (PATHLENA,                                              x
+               (PATHLEN,                                               x
                PATHNAME,                                               x
                O_FLAGS,                                                x
                S_MODE,                                                 x
-               STAT#LENGTH,                                            x
+               STATL,                                                  x
                STAT,                                                   x
                RV,                                                     x
                RC,                                                     x
                RN),MF=(E,BPXOPND)
+        L     R7,RV
+        L     R8,RC
+        L     R9,RN
+        LA 0,27
+        ST 0,0(,0)
         ICM   R10,B'1111',RV
         BL    OpenFail
         LR    R2,R10       # File Descriptor
@@ -106,14 +117,14 @@ DSA   DS 18F
 *
 * Working storage
 *
-RECA    DS  A
 BPXOPND DS  CL(BPXOPNL)
 RV      DS  F
 RC      DS  F
 RN      DS  F
 
-PATHLENA DS A
+PATHLEN  DS F
 PATHNAME DS A
+STATL    DS F
 
 * openstat structures
 O_FLAGS  BPXYOPNF DSECT=NO

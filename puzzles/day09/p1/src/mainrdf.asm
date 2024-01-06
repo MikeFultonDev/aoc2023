@@ -25,8 +25,6 @@ MAIN    AMODE 31
         ST R13,DSA+4
         LR R13,R2
 
-        XR R2,R2
-        XR R3,R3
         L  R2,0(,R1)   # Argument count pointer
         L  R2,0(,R2)   # Argument count
         CHI R2,MinParm # Need 1 parameter plus program name
@@ -35,11 +33,17 @@ MAIN    AMODE 31
         L  R3,4(,R1)   # Argument length list
 
         L  R9,4(,R3)   # Pointer to second parameter
-        LA R10,4(,R9)  # Pointer to second parameter text
 
+        L  R10,0(,R9)  # Pointer to second parameter length
+        AHI R10,-1     # Subtract off NULL terminator
+        ST R10,FileNameLength
+        LA R10,4(,R9)  # Pointer to second parameter text
+        ST R10,FileName
+        LA R0,0
+        ST R0,Buffer
 
 * Call RDFILE
-        LR R1,R10
+        LA R1,RDPARMS
         L  R15,=V(RDFILE)
         BASR R14,R15
         LR   R7,R15
@@ -77,6 +81,12 @@ DYNL    EQU DYNEND-*
 * Stack save area always first
 *
 DSA     DS 18F
+*
+RDPARMS        DS 0H
+FileNameLength DS F
+FileName       DS A
+Buffer         DS A
+
 DYNEND  EQU *
 *
 * Equates
