@@ -45,7 +45,7 @@ RDFILE   AMODE 31
         L   R10,PPATHL
         ST  R10,PATHLEN 
         L   R9,PPATHA
-        ST  R9,PATHNAME
+        MVC PATHNAME(18),0(R9)
         XC  O_FLAGS(OPNF#LENGTH),O_FLAGS
         MVI O_FLAGS4,O_RDONLY
 
@@ -62,8 +62,6 @@ RDFILE   AMODE 31
         L     R7,RV
         L     R8,RC
         L     R9,RN
-        LA 0,27
-        ST 0,0(,0)
         ICM   R10,B'1111',RV
         BL    OpenFail
         LR    R2,R10       # File Descriptor
@@ -117,7 +115,7 @@ RC      DS  F
 RN      DS  F
 
 PATHLEN  DS F
-PATHNAME DS A
+PATHNAME DS CL(1024)
 STATL    DS F
 
 * openstat structures

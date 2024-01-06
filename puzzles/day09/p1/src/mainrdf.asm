@@ -34,11 +34,20 @@ MAIN    AMODE 31
 
         L  R9,4(,R3)   # Pointer to second parameter
 
-        L  R10,0(,R9)  # Pointer to second parameter length
-        AHI R10,-1     # Subtract off NULL terminator
-        ST R10,FileNameLength
+        L  R8,0(,R9)  # second parameter length
+        AHI R8,-1     # Subtract off NULL terminator
+        ST R8,FileNameLength
         LA R10,4(,R9)  # Pointer to second parameter text
         ST R10,FileName
+
+        LHI R2,2
+        STH R2,FD
+        STH R8,Len
+        MVC Txt(80),0(R10)
+        LA R1,Msg
+        L  R15,=V(WRTMSG)
+        BASR R14,R15
+
         LA R0,0
         ST R0,Buffer
 
@@ -86,6 +95,11 @@ RDPARMS        DS 0H
 FileNameLength DS F
 FileName       DS A
 Buffer         DS A
+
+Msg            DS 0H
+FD             DS H
+Len            DS H
+Txt            DS CL80
 
 DYNEND  EQU *
 *
