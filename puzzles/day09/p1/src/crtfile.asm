@@ -1,14 +1,14 @@
 *
 * See WRTMSG for doc links
-* RDFILE: Read a file into storage obtain'ed from STORAGE OBTAIN
+* CRTFILE: Read a file into storage obtain'ed from STORAGE OBTAIN
 * Input: Name of EBCDIC text file to read from
 * Output: Buffer
 * Returns: Buffer size on success, negative value on failure
 *
         PRINT ON,GEN,DATA
-RDFILE   CSECT
-RDFILE   RMODE ANY
-RDFILE   AMODE 31
+CRTFILE CSECT
+CRTFILE RMODE ANY
+CRTFILE AMODE 31
 *
 * R1 points to parameter list
 *  - Pointer to file name length
